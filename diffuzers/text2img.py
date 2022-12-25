@@ -3,6 +3,7 @@ from typing import Optional
 
 import torch
 from diffusers import DiffusionPipeline
+from loguru import logger
 
 
 @dataclass
@@ -29,10 +30,11 @@ class Text2Image:
     def no_safety_checker(self, images, **kwargs):
         return images, False
 
-    def generate_image(self, prompt, negative_prompt, scheduler, guidance_scale, steps, seed):
+    def generate_image(self, prompt, negative_prompt, scheduler, num_images, guidance_scale, steps, seed):
         self._set_scheduler(scheduler)
+        logger.info(self.pipeline.scheduler)
         generator = torch.Generator(device=self.device).manual_seed(seed)
-        num_images = 12  # int(num_images)
+        num_images = int(num_images)
         output_images = self.pipeline(
             prompt,
             negative_prompt=negative_prompt,
