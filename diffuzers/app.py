@@ -7,7 +7,7 @@ from .text2img import Text2Image
 
 @dataclass
 class Diffuzers:
-    text2img_model: str
+    model_path: str
     image_size: int
 
     def __post_init__(self):
