@@ -71,5 +71,5 @@ class Diffuzers:
                             )
                 with gr.TabItem("Image2Image", id="img2img"):
                     gr.Markdown("# Image2Image")
-g
+
         return demo
