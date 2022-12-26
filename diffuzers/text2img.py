@@ -5,12 +5,13 @@ import torch
 from diffusers import DiffusionPipeline
 from loguru import logger
 
+from . import utils
+
 
 @dataclass
 class Text2Image:
     device: Optional[str] = None
     model: Optional[str] = None
-    image_size: Optional[int] = 512
 
     def __post_init__(self):
         self.pipeline = DiffusionPipeline.from_pretrained(
@@ -18,7 +19,7 @@ class Text2Image:
             torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
         )
         self.pipeline.to(self.device)
-        self.pipeline.safety_checker = self.no_safety_checker
+        self.pipeline.safety_checker = utils.no_safety_checker
         self._compatible_schedulers = self.pipeline.scheduler.compatibles
         self.scheduler_config = self.pipeline.scheduler.config
         self.compatible_schedulers = {scheduler.__name__: scheduler for scheduler in self._compatible_schedulers}
@@ -27,10 +28,7 @@ class Text2Image:
         scheduler = self.compatible_schedulers[scheduler_name].from_config(self.scheduler_config)
         self.pipeline.scheduler = scheduler
 
-    def no_safety_checker(self, images, **kwargs):
-        return images, False
-
-    def generate_image(self, prompt, negative_prompt, scheduler, num_images, guidance_scale, steps, seed):
+    def generate_image(self, prompt, negative_prompt, scheduler, image_size, num_images, guidance_scale, steps, seed):
         self._set_scheduler(scheduler)
         logger.info(self.pipeline.scheduler)
         generator = torch.Generator(device=self.device).manual_seed(seed)
@@ -38,8 +36,8 @@ class Text2Image:
         output_images = self.pipeline(
             prompt,
             negative_prompt=negative_prompt,
-            width=self.image_size,
-            height=self.image_size,
+            width=image_size,
+            height=image_size,
             num_inference_steps=steps,
             guidance_scale=guidance_scale,
             num_images_per_prompt=num_images,
