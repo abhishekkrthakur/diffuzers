@@ -35,19 +35,8 @@ For example, to run the web app for the [stable diffusion 2.1](https://huggingfa
 diffuzers run --model stabilityai/stable-diffusion-2-1 --output_path .
 ```
 
+## All CLI Options:
+
 ```bash
 ❯ diffuzers run --help
-usage: diffuzers <command> [<args>] run [-h] --model MODEL --output_path OUTPUT_PATH [--share] [--port PORT]
-                                        [--host HOST]
-
-✨ Run diffuzers app
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --model MODEL         Path to model
-  --output_path OUTPUT_PATH
-                        Output path
-  --share               Share the app
-  --port PORT           Port to run the app on
-  --host HOST           Host to run the app on
 ```
