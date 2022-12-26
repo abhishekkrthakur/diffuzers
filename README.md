@@ -4,6 +4,9 @@ A web ui for [🤗 diffusers](https://github.com/huggingface/diffusers).
 
 < under development, request features using issues, prs not accepted atm >
 
+![image](static/screenshot.png)
+
+
 ## Installation
 
 To install bleeding edge version of diffuzers, clone the repo and install it using pip.
