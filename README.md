@@ -25,17 +25,29 @@ pip install diffuzers
 To run the web app, run the following command:
 
 ```bash
-diffuzers run --model_path <path to model> --image_size <image size>
+diffuzers run --model <path to model> --output_path <path to output folder>
 ``` 
     
 For example, to run the web app for the [stable diffusion 2.1](https://huggingface.co/stabilityai/stable-diffusion-2-1) model, run the following command:
 
 
 ```bash
-diffuzers run --model_path stabilityai/stable-diffusion-2-1 --image_size 768
+diffuzers run --model stabilityai/stable-diffusion-2-1 --output_path .
 ```
 
-Please note to use the correct image size for the model. For example, for the [stable diffusion 2.1](https://huggingface.co/stabilityai/stable-diffusion-2-1) model, the image size is 768. For the [stable diffusion 2.1 base](https://huggingface.co/stabilityai/stable-diffusion-2-1-base) model, the image size is 512.
+```bash
+❯ diffuzers run --help
+usage: diffuzers <command> [<args>] run [-h] --model MODEL --output_path OUTPUT_PATH [--share] [--port PORT]
+                                        [--host HOST]
 
+✨ Run diffuzers app
 
-The webapp runs on port 7860.
+optional arguments:
+  -h, --help            show this help message and exit
+  --model MODEL         Path to model
+  --output_path OUTPUT_PATH
+                        Output path
+  --share               Share the app
+  --port PORT           Port to run the app on
+  --host HOST           Host to run the app on
+```
