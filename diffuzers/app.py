@@ -99,25 +99,120 @@ class Diffuzers:
                 images=output_images,
                 metadata=params_used,
                 folder_name=project_name,
+                prefix="text2img",
             )
 
         return [output_images, params_used]
 
     def _img2img_input(self):
-        pass
+        with gr.Column():
+            input_image = gr.Image(source="upload", label="input image | size must match model", type="pil")
+            strength = gr.Slider(0, 1, 0.8, label="Strength")
+            available_schedulers = list(self.img2img.compatible_schedulers.keys())
+            scheduler = gr.Dropdown(choices=available_schedulers, label="Scheduler", value=available_schedulers[0])
+            image_size = gr.Number(512, label="Image size (image will be resized to this)", precision=0)
+            guidance_scale = gr.Slider(1, maximum=20, value=7.5, step=0.5, label="Guidance scale")
+            num_images = gr.Slider(4, 128, 4, label="Number of images", step=4)
+            steps = gr.Slider(1, 150, 50, label="Steps")
+        with gr.Column():
+            project_name_text = "Project name (optional; used to save the images, if provided)"
+            project_name = gr.Textbox(label=project_name_text, lines=1, max_lines=1, placeholder="my_project")
+            prompt = gr.Textbox(label="Prompt", lines=3, max_lines=3)
+            negative_prompt = gr.Textbox(label="Negative prompt (optional)", lines=3, max_lines=3)
+            seed = gr.Slider(minimum=1, step=1, maximum=999999, randomize=True, label="Seed")
+            generate_button = gr.Button("Generate")
+        params_dict = {
+            "input_image": input_image,
+            "prompt": prompt,
+            "negative_prompt": negative_prompt,
+            "strength": strength,
+            "scheduler": scheduler,
+            "image_size": image_size,
+            "guidance_scale": guidance_scale,
+            "num_images": num_images,
+            "steps": steps,
+            "seed": seed,
+            "project_name": project_name,
+            "generate_button": generate_button,
+        }
+        return params_dict
 
-    def _save_images(self, images, metadata, folder_name):
-        folder_path = os.path.join(self.output_path, "text2img", folder_name)
+    def _img2img_output(self):
+        with gr.Column():
+            img2img_output = gr.Gallery()
+            img2img_output.style(grid=[4], container=False)
+        with gr.Column():
+            img2img_output_params = gr.Markdown()
+        params_dict = {
+            "output": img2img_output,
+            "markdown": img2img_output_params,
+        }
+        return params_dict
+
+    def _img2img_generate(
+        self,
+        input_image,
+        prompt,
+        negative_prompt,
+        strength,
+        scheduler,
+        image_size,
+        guidance_scale,
+        num_images,
+        steps,
+        seed,
+        project_name,
+    ):
+        output_images = self.img2img.generate_image(
+            image=input_image,
+            prompt=prompt,
+            negative_prompt=negative_prompt,
+            strength=strength,
+            scheduler=scheduler,
+            image_size=image_size,
+            guidance_scale=guidance_scale,
+            steps=steps,
+            seed=seed,
+            num_images=num_images,
+        )
+        params_used = f" - **Prompt:** {prompt}"
+        params_used += f"\n - **Negative prompt:** {negative_prompt}"
+        params_used += f"\n - **Scheduler:** {scheduler}"
+        params_used += f"\n - **Strength:** {strength}"
+        params_used += f"\n - **Image size:** {image_size}"
+        params_used += f"\n - **Guidance scale:** {guidance_scale}"
+        params_used += f"\n - **Steps:** {steps}"
+        params_used += f"\n - **Seed:** {seed}"
+
+        if len(project_name.strip()) > 0:
+            self._save_images(
+                images=output_images,
+                metadata=params_used,
+                folder_name=project_name,
+                prefix="img2img",
+            )
+
+        return [output_images, params_used]
+
+    def _save_images(self, images, metadata, folder_name, prefix):
+        folder_path = os.path.join(self.output_path, prefix, folder_name)
         os.makedirs(folder_path, exist_ok=True)
         for idx, image in enumerate(images):
             text2img_metadata = PngInfo()
-            text2img_metadata.add_text("text2img", metadata)
+            text2img_metadata.add_text(prefix, metadata)
             image.save(os.path.join(folder_path, f"{idx}.png"), format="PNG", pnginfo=text2img_metadata)
         with open(os.path.join(folder_path, "metadata.txt"), "w") as f:
             f.write(metadata)
 
     def _png_info(self, img):
-        return img.info["text2img"]
+        text2img_md = img.info.get("text2img", "")
+        img2img_md = img.info.get("img2img", "")
+        return_text = ""
+        if len(text2img_md) > 0:
+            return_text += f"## Text2Img\n{text2img_md}\n"
+        if len(img2img_md) > 0:
+            return_text += f"## Img2Img\n{img2img_md}\n"
+        return return_text
 
     def app(self):
         with gr.Blocks() as demo:
@@ -151,7 +246,27 @@ class Diffuzers:
                             outputs=[text2img_output["output"], text2img_output["markdown"]],
                         )
                 with gr.TabItem("Image2Image", id="img2img"):
-                    gr.Markdown("# coming soon!")
+                    with gr.Row():
+                        img2img_input = self._img2img_input()
+                    with gr.Row():
+                        img2img_output = self._img2img_output()
+                        img2img_input["generate_button"].click(
+                            fn=self._img2img_generate,
+                            inputs=[
+                                img2img_input["input_image"],
+                                img2img_input["prompt"],
+                                img2img_input["negative_prompt"],
+                                img2img_input["strength"],
+                                img2img_input["scheduler"],
+                                img2img_input["image_size"],
+                                img2img_input["guidance_scale"],
+                                img2img_input["num_images"],
+                                img2img_input["steps"],
+                                img2img_input["seed"],
+                                img2img_input["project_name"],
+                            ],
+                            outputs=[img2img_output["output"], img2img_output["markdown"]],
+                        )
                 with gr.TabItem("Inpainting", id="inpainting"):
                     gr.Markdown("# coming soon!")
                 with gr.TabItem("ImageInfo", id="imginfo"):

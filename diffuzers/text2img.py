@@ -1,3 +1,4 @@
+import gc
 from dataclasses import dataclass
 from typing import Optional
 
@@ -43,4 +44,6 @@ class Text2Image:
             num_images_per_prompt=num_images,
             generator=generator,
         ).images
+        torch.cuda.empty_cache()
+        gc.collect()
         return output_images
