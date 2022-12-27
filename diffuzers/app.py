@@ -58,7 +58,7 @@ def run_app(args, text2img, img2img, inpainting):
         [
             "Text2Img",
             "Img2Img",
-            "Outpainting",
+            # "Outpainting",
             "Inpainting",
             "ImageInfo",
         ],
