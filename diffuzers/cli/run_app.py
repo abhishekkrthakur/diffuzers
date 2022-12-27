@@ -1,10 +1,13 @@
+import subprocess
 from argparse import ArgumentParser
 
 from . import BaseDiffuzersCommand
 
 
 def run_app_command_factory(args):
-    return RunDiffuzersAppCommand(args.model, args.output_path, args.share, args.port, args.host)
+    return RunDiffuzersAppCommand(
+        args.model, args.inpainting_model, args.output_path, args.share, args.port, args.host
+    )
 
 
 class RunDiffuzersAppCommand(BaseDiffuzersCommand):
@@ -19,6 +22,13 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
             type=str,
             required=True,
             help="Path to model",
+        )
+        run_app_parser.add_argument(
+            "--inpainting_model",
+            type=str,
+            required=False,
+            help="Inpainting/Outpainting model",
+            default="stabilityai/stable-diffusion-2-inpainting",
         )
         run_app_parser.add_argument(
             "--output_path",
@@ -47,16 +57,43 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
         )
         run_app_parser.set_defaults(func=run_app_command_factory)
 
-    def __init__(self, model, output_path, share, port, host):
+    def __init__(self, model, inpainting_model, output_path, share, port, host):
         self.model = model
+        self.inpainting_model = inpainting_model
         self.output_path = output_path
         self.share = share
         self.port = port
         self.host = host
 
     def run(self):
-        from ..app import Diffuzers
+        # from ..app import Diffuzers
 
-        print(self.share)
-        app = Diffuzers(self.model, self.output_path).app()
-        app.launch(show_api=False, share=self.share, server_port=self.port, server_name=self.host)
+        # print(self.share)
+        # app = Diffuzers(self.model, self.output_path).app()
+        # app.launch(show_api=False, share=self.share, server_port=self.port, server_name=self.host)
+        import os
+
+        dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, "..", "app.py")
+        subprocess.run(
+            [
+                "streamlit",
+                "run",
+                filename,
+                "--browser.gatherUsageStats",
+                "false",
+                "--browser.serverAddress",
+                self.host,
+                "--server.port",
+                str(self.port),
+                "--theme.base",
+                "light",
+                "--",
+                "--model",
+                self.model,
+                "--output_path",
+                self.output_path,
+                "--inpainting_model",
+                self.inpainting_model,
+            ]
+        )
