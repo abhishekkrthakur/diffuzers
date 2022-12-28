@@ -91,21 +91,21 @@ class Text2Image:
     #         generate_button = gr.Button("Generate")
 
     def app(self):
-        col1, col2 = st.columns(2)
-        with col1:
-            prompt = st.text_area("Prompt", "Blue elephant")
-        with col2:
-            negative_prompt = st.text_area("Negative Prompt", "")
-        submit = st.button("Generate")
-
-        # sidebar options
         available_schedulers = list(self.compatible_schedulers.keys())
-        scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
-        image_size = st.sidebar.slider("Image size", 256, 1024, 512, 256)
-        guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
-        num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
-        steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
-        seed = st.sidebar.slider("Seed", 1, 999999, 1, 1)
+        with st.form(key="text2img"):
+            col1, col2 = st.columns(2)
+            with col1:
+                prompt = st.text_area("Prompt", "Blue elephant")
+            with col2:
+                negative_prompt = st.text_area("Negative Prompt", "")
+            # sidebar options
+            scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
+            image_size = st.sidebar.slider("Image size", 256, 1024, 512, 256)
+            guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
+            num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
+            steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
+            seed = st.sidebar.slider("Seed", 1, 999999, 1, 1)
+            submit = st.form_submit_button("Generate")
 
         if submit:
             with st.spinner("Generating images..."):

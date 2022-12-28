@@ -85,26 +85,28 @@ class Img2Img:
         return output_images, _metadata
 
     def app(self):
+        available_schedulers = list(self.compatible_schedulers.keys())
         input_image = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
         if input_image is not None:
             input_image = Image.open(input_image)
             st.image(input_image, use_column_width=True)
-        col1, col2 = st.columns(2)
-        with col1:
-            prompt = st.text_area("Prompt", "Blue elephant")
-        with col2:
-            negative_prompt = st.text_area("Negative Prompt", "")
-        submit = st.button("Generate")
 
-        # sidebar options
-        available_schedulers = list(self.compatible_schedulers.keys())
-        scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
-        image_size = st.sidebar.slider("Image size", 256, 1024, 512, 256)
-        guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
-        strength = st.sidebar.slider("Strength", 0.0, 1.0, 0.8, 0.05)
-        num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
-        steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
-        seed = st.sidebar.slider("Seed", 1, 999999, 1, 1)
+        with st.form(key="img2img"):
+            col1, col2 = st.columns(2)
+            with col1:
+                prompt = st.text_area("Prompt", "")
+            with col2:
+                negative_prompt = st.text_area("Negative Prompt", "")
+
+            scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
+            image_size = st.sidebar.slider("Image size", 256, 1024, 512, 256)
+            guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
+            strength = st.sidebar.slider("Strength", 0.0, 1.0, 0.8, 0.05)
+            num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
+            steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
+            seed = st.sidebar.slider("Seed", 1, 999999, 1, 1)
+
+            submit = st.form_submit_button("Generate")
 
         if submit:
             with st.spinner("Generating images..."):

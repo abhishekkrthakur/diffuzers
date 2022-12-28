@@ -52,8 +52,8 @@ def get_models(_args, device):
 
 
 def run_app(args, text2img, img2img, inpainting):
-    st.title("Diffuzers")
-    task = st.sidebar.selectbox(
+    st.sidebar.title("Diffuzers")
+    task = st.selectbox(
         "Task",
         [
             "Text2Img",
