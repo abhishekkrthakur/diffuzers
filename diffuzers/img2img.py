@@ -23,6 +23,7 @@ from diffuzers import utils
 class Img2Img:
     model: Optional[str] = None
     device: Optional[str] = None
+    output_path: Optional[str] = None
     text2img_model: Optional[Union[StableDiffusionPipeline, AltDiffusionPipeline]] = None
 
     def __post_init__(self):
@@ -82,6 +83,13 @@ class Img2Img:
         metadata = json.dumps(metadata)
         _metadata = PngInfo()
         _metadata.add_text("img2img", metadata)
+
+        utils.save_images(
+            images=output_images,
+            module="img2img",
+            metadata=metadata,
+            output_path=self.output_path,
+        )
         return output_images, _metadata
 
     def app(self):

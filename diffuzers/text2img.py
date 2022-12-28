@@ -16,6 +16,7 @@ from diffuzers import utils
 class Text2Image:
     device: Optional[str] = None
     model: Optional[str] = None
+    output_path: Optional[str] = None
 
     def __post_init__(self):
         self.pipeline = DiffusionPipeline.from_pretrained(
@@ -63,32 +64,14 @@ class Text2Image:
         _metadata = PngInfo()
         _metadata.add_text("text2img", metadata)
 
-        return output_images, _metadata
+        utils.save_images(
+            images=output_images,
+            module="text2img",
+            metadata=metadata,
+            output_path=self.output_path,
+        )
 
-    # def _text2img_input(self):
-    #     with gr.Column():
-    #         project_name_text = "Project name (optional; used to save the images, if provided)"
-    #         project_name = gr.Textbox(label=project_name_text, lines=1, max_lines=1, placeholder="my_project")
-    #         # TODO: add batch support
-    #         # with gr.Tabs():
-    #         #     with gr.TabItem("single"):
-    #         prompt = gr.Textbox(label="Prompt", lines=3, max_lines=3)
-    #         # with gr.TabItem("batch"):
-    #         #     prompt = gr.File(file_types=["text"])
-    #         # with gr.Tabs():
-    #         #     with gr.TabItem("single"):
-    #         negative_prompt = gr.Textbox(label="Negative prompt (optional)", lines=3, max_lines=3)
-    #         # with gr.TabItem("batch"):
-    #         #     negative_prompt = gr.File(file_types=["text"])
-    #     with gr.Column():
-    #         available_schedulers = list(self.text2img.compatible_schedulers.keys())
-    #         scheduler = gr.Dropdown(choices=available_schedulers, label="Scheduler", value=available_schedulers[0])
-    #         image_size = gr.Number(512, label="Image size", precision=0)
-    #         guidance_scale = gr.Slider(1, maximum=20, value=7.5, step=0.5, label="Guidance scale")
-    #         num_images = gr.Slider(1, 128, 1, label="Number of images per prompt", step=4)
-    #         steps = gr.Slider(1, 150, 50, label="Steps")
-    #         seed = gr.Slider(minimum=1, step=1, maximum=999999, randomize=True, label="Seed")
-    #         generate_button = gr.Button("Generate")
+        return output_images, _metadata
 
     def app(self):
         available_schedulers = list(self.compatible_schedulers.keys())

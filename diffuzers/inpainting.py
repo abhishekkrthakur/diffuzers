@@ -18,6 +18,7 @@ from diffuzers import utils
 class Inpainting:
     model: Optional[str] = None
     device: Optional[str] = None
+    output_path: Optional[str] = None
 
     def __post_init__(self):
         self.pipeline = StableDiffusionInpaintPipeline.from_pretrained(
@@ -65,6 +66,14 @@ class Inpainting:
         metadata = json.dumps(metadata)
         _metadata = PngInfo()
         _metadata.add_text("inpainting", metadata)
+
+        utils.save_images(
+            images=output_images,
+            module="inpainting",
+            metadata=metadata,
+            output_path=self.output_path,
+        )
+
         torch.cuda.empty_cache()
         gc.collect()
         return output_images, _metadata

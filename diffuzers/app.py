@@ -38,15 +38,18 @@ def get_models(_args, device):
     text2img = Text2Image(
         model=_args.model,
         device=device,
+        output_path=_args.output_path,
     )
     inpainting = Inpainting(
         model=args.inpainting_model,
         device=device,
+        output_path=_args.output_path,
     )
     img2img = Img2Img(
         model=_args.model,
         device=device,
         text2img_model=text2img.pipeline,
+        output_path=_args.output_path,
     )
     return text2img, img2img, inpainting
 

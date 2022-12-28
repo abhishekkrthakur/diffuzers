@@ -6,10 +6,32 @@ import zipfile
 import streamlit as st
 import streamlit_ext as ste
 from st_clickable_images import clickable_images
+from datetime import datetime
+from PIL.PngImagePlugin import PngInfo
 
 
 def no_safety_checker(images, **kwargs):
     return images, False
+
+
+def save_images(images, module, metadata, output_path):
+    current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    os.makedirs(output_path, exist_ok=True)
+    os.makedirs(f"{output_path}/{module}", exist_ok=True)
+    os.makedirs(f"{output_path}/{module}/{current_datetime}", exist_ok=True)
+
+    _metadata = PngInfo()
+    _metadata.add_text("text2img", metadata)
+
+    for i, img in enumerate(images):
+        img.save(
+            f"{output_path}/{module}/{current_datetime}/{i}.png",
+            pnginfo=_metadata,
+        )
+
+    # save metadata as text file
+    with open(f"{output_path}/{module}/{current_datetime}/metadata.txt", "w") as f:
+        f.write(metadata)
 
 
 def display_and_download_images(output_images, metadata):

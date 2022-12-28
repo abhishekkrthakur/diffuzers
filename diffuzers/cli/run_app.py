@@ -21,20 +21,20 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
             "--model",
             type=str,
             required=True,
-            help="Path to model",
+            help="Path to model. This model will be used for text2img and img2img tasks.",
         )
         run_app_parser.add_argument(
             "--inpainting_model",
             type=str,
             required=False,
-            help="Inpainting/Outpainting model",
+            help="Inpainting/Outpainting model. If not provided, the default model will be used which is sd2.0 inpainting model",
             default="stabilityai/stable-diffusion-2-inpainting",
         )
         run_app_parser.add_argument(
             "--output_path",
             type=str,
-            required=True,
-            help="Output path",
+            required=False,
+            help="Output path is optional, but if provided, all generations will automatically be saved to this path.",
         )
         run_app_parser.add_argument(
             "--share",
@@ -44,7 +44,7 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
         run_app_parser.add_argument(
             "--port",
             type=int,
-            default=7860,
+            default=10000,
             help="Port to run the app on",
             required=False,
         )
