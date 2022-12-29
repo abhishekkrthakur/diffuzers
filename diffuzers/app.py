@@ -1,7 +1,6 @@
 import argparse
 
 import streamlit as st
-import torch
 from loguru import logger
 
 from diffuzers.image_info import ImageInfo
@@ -30,24 +29,30 @@ def parse_args():
         required=True,
         help="Path to inpainting model",
     )
+    parser.add_argument(
+        "--device",
+        type=str,
+        required=True,
+        help="Device to use, e.g. cpu, cuda, cuda:0, mps etc.",
+    )
     return parser.parse_args()
 
 
 @st.experimental_singleton
-def get_models(_args, device):
+def get_models(_args):
     text2img = Text2Image(
         model=_args.model,
-        device=device,
+        device=args.device,
         output_path=_args.output_path,
     )
     inpainting = Inpainting(
         model=args.inpainting_model,
-        device=device,
+        device=args.device,
         output_path=_args.output_path,
     )
     img2img = Img2Img(
         model=_args.model,
-        device=device,
+        device=args.device,
         text2img_model=text2img.pipeline,
         output_path=_args.output_path,
     )
@@ -81,6 +86,5 @@ def run_app(args, text2img, img2img, inpainting):
 if __name__ == "__main__":
     args = parse_args()
     logger.info(f"Args: {args}")
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    text2img, img2img, inpainting = get_models(args, device)
+    text2img, img2img, inpainting = get_models(args)
     run_app(args, text2img, img2img, inpainting)

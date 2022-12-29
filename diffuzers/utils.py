@@ -2,12 +2,12 @@ import base64
 import os
 import tempfile
 import zipfile
+from datetime import datetime
 
 import streamlit as st
 import streamlit_ext as ste
-from st_clickable_images import clickable_images
-from datetime import datetime
 from PIL.PngImagePlugin import PngInfo
+from st_clickable_images import clickable_images
 
 
 def no_safety_checker(images, **kwargs):

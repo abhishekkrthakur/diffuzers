@@ -29,6 +29,12 @@ class Text2Image:
         self.scheduler_config = self.pipeline.scheduler.config
         self.compatible_schedulers = {scheduler.__name__: scheduler for scheduler in self._compatible_schedulers}
 
+        if self.device == "mps":
+            self.pipeline.enable_attention_slicing()
+            # warmup
+            prompt = "a photo of an astronaut riding a horse on mars"
+            _ = self.pipeline(prompt, num_inference_steps=1)
+
     def _set_scheduler(self, scheduler_name):
         scheduler = self.compatible_schedulers[scheduler_name].from_config(self.scheduler_config)
         self.pipeline.scheduler = scheduler

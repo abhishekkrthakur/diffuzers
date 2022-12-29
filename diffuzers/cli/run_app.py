@@ -1,12 +1,20 @@
 import subprocess
 from argparse import ArgumentParser
 
+import torch
+
 from . import BaseDiffuzersCommand
 
 
 def run_app_command_factory(args):
     return RunDiffuzersAppCommand(
-        args.model, args.inpainting_model, args.output_path, args.share, args.port, args.host
+        args.model,
+        args.inpainting_model,
+        args.output_path,
+        args.share,
+        args.port,
+        args.host,
+        args.device,
     )
 
 
@@ -55,15 +63,25 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
             help="Host to run the app on",
             required=False,
         )
+        run_app_parser.add_argument(
+            "--device",
+            type=str,
+            required=False,
+            help="Device to use, e.g. cpu, cuda, cuda:0, mps (for m1 mac) etc.",
+        )
         run_app_parser.set_defaults(func=run_app_command_factory)
 
-    def __init__(self, model, inpainting_model, output_path, share, port, host):
+    def __init__(self, model, inpainting_model, output_path, share, port, host, device):
         self.model = model
         self.inpainting_model = inpainting_model
         self.output_path = output_path
         self.share = share
         self.port = port
         self.host = host
+        self.device = device
+
+        if self.device is None:
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
     def run(self):
         # from ..app import Diffuzers
@@ -95,5 +113,7 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
                 self.output_path,
                 "--inpainting_model",
                 self.inpainting_model,
+                "--device",
+                self.device,
             ]
         )

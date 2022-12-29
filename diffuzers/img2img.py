@@ -1,8 +1,10 @@
 import gc
 import json
 from dataclasses import dataclass
+from io import BytesIO
 from typing import Optional, Union
 
+import requests
 import streamlit as st
 import torch
 from diffusers import (
@@ -46,6 +48,22 @@ class Img2Img:
         self._compatible_schedulers = self.pipeline.scheduler.compatibles
         self.scheduler_config = self.pipeline.scheduler.config
         self.compatible_schedulers = {scheduler.__name__: scheduler for scheduler in self._compatible_schedulers}
+
+        if self.device == "mps":
+            self.pipeline.enable_attention_slicing()
+            # warmup
+            url = "https://raw.githubusercontent.com/CompVis/stable-diffusion/main/assets/stable-samples/img2img/sketch-mountains-input.jpg"
+            response = requests.get(url)
+            init_image = Image.open(BytesIO(response.content)).convert("RGB")
+            init_image.thumbnail((768, 768))
+            prompt = "A fantasy landscape, trending on artstation"
+            _ = self.pipeline(
+                prompt=prompt,
+                image=init_image,
+                strength=0.75,
+                guidance_scale=7.5,
+                num_inference_steps=1,
+            )
 
     def _set_scheduler(self, scheduler_name):
         scheduler = self.compatible_schedulers[scheduler_name].from_config(self.scheduler_config)
