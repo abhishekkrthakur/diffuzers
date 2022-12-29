@@ -20,7 +20,8 @@ def parse_args():
     parser.add_argument(
         "--output_path",
         type=str,
-        required=True,
+        required=False,
+        default=None,
         help="Output path",
     )
     parser.add_argument(

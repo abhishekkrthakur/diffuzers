@@ -93,27 +93,27 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
 
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, "..", "app.py")
-        subprocess.run(
-            [
-                "streamlit",
-                "run",
-                filename,
-                "--browser.gatherUsageStats",
-                "false",
-                "--browser.serverAddress",
-                self.host,
-                "--server.port",
-                str(self.port),
-                "--theme.base",
-                "light",
-                "--",
-                "--model",
-                self.model,
-                "--output_path",
-                self.output_path,
-                "--inpainting_model",
-                self.inpainting_model,
-                "--device",
-                self.device,
-            ]
-        )
+        cmd = [
+            "streamlit",
+            "run",
+            filename,
+            "--browser.gatherUsageStats",
+            "false",
+            "--browser.serverAddress",
+            self.host,
+            "--server.port",
+            str(self.port),
+            "--theme.base",
+            "light",
+            "--",
+            "--model",
+            self.model,
+            "--inpainting_model",
+            self.inpainting_model,
+            "--device",
+            self.device,
+        ]
+        if self.output_path is not None:
+            cmd.extend(["--output_path", self.output_path])
+
+        subprocess.run(cmd)

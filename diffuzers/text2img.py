@@ -81,6 +81,10 @@ class Text2Image:
 
     def app(self):
         available_schedulers = list(self.compatible_schedulers.keys())
+        if "EulerAncestralDiscreteScheduler" in available_schedulers:
+            available_schedulers.insert(
+                0, available_schedulers.pop(available_schedulers.index("EulerAncestralDiscreteScheduler"))
+            )
         with st.form(key="text2img"):
             col1, col2 = st.columns(2)
             with col1:

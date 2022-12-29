@@ -112,6 +112,12 @@ class Img2Img:
 
     def app(self):
         available_schedulers = list(self.compatible_schedulers.keys())
+        # if EulerAncestralDiscreteScheduler is available in available_schedulers, move it to the first position
+        if "EulerAncestralDiscreteScheduler" in available_schedulers:
+            available_schedulers.insert(
+                0, available_schedulers.pop(available_schedulers.index("EulerAncestralDiscreteScheduler"))
+            )
+
         input_image = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
         if input_image is not None:
             input_image = Image.open(input_image)

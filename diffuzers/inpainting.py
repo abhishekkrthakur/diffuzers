@@ -117,6 +117,10 @@ class Inpainting:
 
         # sidebar options
         available_schedulers = list(self.compatible_schedulers.keys())
+        if "EulerAncestralDiscreteScheduler" in available_schedulers:
+            available_schedulers.insert(
+                0, available_schedulers.pop(available_schedulers.index("EulerAncestralDiscreteScheduler"))
+            )
         scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
         guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
         num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)

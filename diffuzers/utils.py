@@ -6,6 +6,7 @@ from datetime import datetime
 
 import streamlit as st
 import streamlit_ext as ste
+from loguru import logger
 from PIL.PngImagePlugin import PngInfo
 from st_clickable_images import clickable_images
 
@@ -15,6 +16,9 @@ def no_safety_checker(images, **kwargs):
 
 
 def save_images(images, module, metadata, output_path):
+    if output_path is None:
+        logger.warning("No output path specified, skipping saving images")
+        return
     current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     os.makedirs(output_path, exist_ok=True)
     os.makedirs(f"{output_path}/{module}", exist_ok=True)
@@ -32,6 +36,7 @@ def save_images(images, module, metadata, output_path):
     # save metadata as text file
     with open(f"{output_path}/{module}/{current_datetime}/metadata.txt", "w") as f:
         f.write(metadata)
+    logger.info(f"Saved images to {output_path}/{module}/{current_datetime}")
 
 
 def display_and_download_images(output_images, metadata):
