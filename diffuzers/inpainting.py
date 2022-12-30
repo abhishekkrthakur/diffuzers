@@ -56,7 +56,7 @@ class Inpainting:
                 prompt=prompt,
                 image=init_image,
                 mask_image=mask_image,
-                num_inference_steps=1,
+                num_inference_steps=2,
             )
 
     def _set_scheduler(self, scheduler_name):
@@ -68,7 +68,12 @@ class Inpainting:
     ):
         self._set_scheduler(scheduler)
         logger.info(self.pipeline.scheduler)
-        generator = torch.Generator(device=self.device).manual_seed(seed)
+
+        if self.device == "mps":
+            generator = None
+            num_images = 1
+        else:
+            generator = torch.Generator(device=self.device).manual_seed(seed)
 
         output_images = self.pipeline(
             prompt=prompt,

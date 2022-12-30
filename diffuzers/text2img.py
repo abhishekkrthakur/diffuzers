@@ -36,7 +36,7 @@ class Text2Image:
             self.pipeline.enable_attention_slicing()
             # warmup
             prompt = "a photo of an astronaut riding a horse on mars"
-            _ = self.pipeline(prompt, num_inference_steps=1)
+            _ = self.pipeline(prompt, num_inference_steps=2)
 
     def _set_scheduler(self, scheduler_name):
         scheduler = self.compatible_schedulers[scheduler_name].from_config(self.scheduler_config)
@@ -45,7 +45,11 @@ class Text2Image:
     def generate_image(self, prompt, negative_prompt, scheduler, image_size, num_images, guidance_scale, steps, seed):
         self._set_scheduler(scheduler)
         logger.info(self.pipeline.scheduler)
-        generator = torch.Generator(device=self.device).manual_seed(seed)
+        if self.device == "mps":
+            generator = None
+            num_images = 1
+        else:
+            generator = torch.Generator(device=self.device).manual_seed(seed)
         num_images = int(num_images)
         output_images = self.pipeline(
             prompt,
