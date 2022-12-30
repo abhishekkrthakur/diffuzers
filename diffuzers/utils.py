@@ -5,13 +5,13 @@ import tempfile
 import zipfile
 from datetime import datetime
 
+import requests
 import streamlit as st
 import streamlit_ext as ste
 import torch
 from loguru import logger
 from PIL.PngImagePlugin import PngInfo
 from st_clickable_images import clickable_images
-import requests
 
 
 def no_safety_checker(images, **kwargs):

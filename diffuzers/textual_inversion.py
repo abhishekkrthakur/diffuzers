@@ -19,15 +19,12 @@ def load_embed(learned_embeds_path, text_encoder, tokenizer, token=None):
     trained_token = list(loaded_learned_embeds.keys())[0]
     embeds = loaded_learned_embeds[trained_token]
 
-    # cast to dtype of text_encoder
-    dtype = text_encoder.get_input_embeddings().weight.dtype
-
     # add the token in tokenizer
     token = token if token is not None else trained_token
     num_added_tokens = tokenizer.add_tokens(token)
     i = 1
     while num_added_tokens == 0:
-        logger.info(f"The tokenizer already contains the token {token}.")
+        logger.warning(f"The tokenizer already contains the token {token}.")
         token = f"{token[:-1]}-{i}>"
         logger.info(f"Attempting to add the token {token}.")
         num_added_tokens = tokenizer.add_tokens(token)
