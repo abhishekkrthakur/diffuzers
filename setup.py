@@ -37,6 +37,7 @@ setup(
     name="diffuzers",
     description="diffuzers",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Abhishek Thakur",
     url="https://github.com/abhishekkrthakur/diffuzers",
     packages=find_packages("."),

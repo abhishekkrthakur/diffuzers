@@ -29,13 +29,15 @@ To run the web app, run the following command:
 
 ```bash
 diffuzers run
-``` 
+```
 
 ## All CLI Options:
 
 ```bash
 ❯ diffuzers run --help
-usage: diffuzers <command> <args> run 
+
+usage: diffuzers <command> [<args>] run [-h] [--output OUTPUT] [--share] [--port PORT] [--host HOST]
+                                        [--device DEVICE]
 
 ✨ Run diffuzers app
 
