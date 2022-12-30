@@ -51,7 +51,7 @@ class TextualInversion:
     output_path: Optional[str] = None
 
     def __str__(self) -> str:
-        return f"TextualInversion(model={self.model}, embeddings={self.embeddings}, token_identifier={self.token_identifier}, device={self.device}, output_path={self.output_path})"
+        return f"TextualInversion(model={self.model}, embeddings={self.embeddings_url}, token_identifier={self.token_identifier}, device={self.device}, output_path={self.output_path})"
 
     def __post_init__(self):
         self.pipeline = DiffusionPipeline.from_pretrained(

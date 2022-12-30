@@ -60,7 +60,7 @@ def save_images(images, module, metadata, output_path):
     logger.info(f"Saved images to {output_path}/{module}/{current_datetime}")
 
 
-def display_and_download_images(output_images, metadata, download_col):
+def display_and_download_images(output_images, metadata, download_col=None):
     # st.image(output_images, width=128, output_format="PNG")
 
     with st.spinner("Preparing images for download..."):
