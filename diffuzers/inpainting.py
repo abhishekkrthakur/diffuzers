@@ -70,7 +70,7 @@ class Inpainting:
         logger.info(self.pipeline.scheduler)
 
         if self.device == "mps":
-            generator = None
+            generator = torch.manual_seed(seed)
             num_images = 1
         else:
             generator = torch.Generator(device=self.device).manual_seed(seed)

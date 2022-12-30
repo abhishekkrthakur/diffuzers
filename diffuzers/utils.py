@@ -11,10 +11,20 @@ import torch
 from loguru import logger
 from PIL.PngImagePlugin import PngInfo
 from st_clickable_images import clickable_images
+import requests
 
 
 def no_safety_checker(images, **kwargs):
     return images, False
+
+
+def download_file(file_url):
+    r = requests.get(file_url, stream=True)
+    with tempfile.NamedTemporaryFile(delete=False) as tmp:
+        for chunk in r.iter_content(chunk_size=1024):
+            if chunk:  # filter out keep-alive new chunks
+                tmp.write(chunk)
+    return tmp.name
 
 
 def clear_memory(preserve):
