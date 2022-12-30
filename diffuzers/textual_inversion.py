@@ -14,10 +14,14 @@ from diffuzers import utils
 
 def load_embed(learned_embeds_path, text_encoder, tokenizer, token=None):
     loaded_learned_embeds = torch.load(learned_embeds_path, map_location="cpu")
+    if len(loaded_learned_embeds) > 2:
+        embeds = loaded_learned_embeds["string_to_param"]["*"][-1, :]
+    else:
+        # separate token and the embeds
+        trained_token = list(loaded_learned_embeds.keys())[0]
+        embeds = loaded_learned_embeds[trained_token]
 
-    # separate token and the embeds
-    trained_token = list(loaded_learned_embeds.keys())[0]
-    embeds = loaded_learned_embeds[trained_token]
+    print(embeds.shape)
 
     # add the token in tokenizer
     token = token if token is not None else trained_token
