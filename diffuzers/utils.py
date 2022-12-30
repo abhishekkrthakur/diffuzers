@@ -1,4 +1,5 @@
 import base64
+import gc
 import os
 import tempfile
 import zipfile
@@ -6,6 +7,7 @@ from datetime import datetime
 
 import streamlit as st
 import streamlit_ext as ste
+import torch
 from loguru import logger
 from PIL.PngImagePlugin import PngInfo
 from st_clickable_images import clickable_images
@@ -13,6 +15,15 @@ from st_clickable_images import clickable_images
 
 def no_safety_checker(images, **kwargs):
     return images, False
+
+
+def clear_memory(preserve):
+    torch.cuda.empty_cache()
+    gc.collect()
+    to_clear = ["inpainting", "text2img", "img2text"]
+    for key in to_clear:
+        if key not in preserve and key in st.session_state:
+            del st.session_state[key]
 
 
 def save_images(images, module, metadata, output_path):
@@ -39,7 +50,7 @@ def save_images(images, module, metadata, output_path):
     logger.info(f"Saved images to {output_path}/{module}/{current_datetime}")
 
 
-def display_and_download_images(output_images, metadata):
+def display_and_download_images(output_images, metadata, download_col):
     # st.image(output_images, width=128, output_format="PNG")
 
     with st.spinner("Preparing images for download..."):
@@ -59,13 +70,20 @@ def display_and_download_images(output_images, metadata):
                     if filename.endswith(".png"):
                         zip.write(os.path.join(tmpdir, filename), filename)
 
-            # download the zip
-            ste.download_button(
-                label="Download",
-                data=open(zip_path, "rb").read(),
-                file_name="images.zip",
-                mime="application/zip",
-            )
+            if download_col is not None:
+                download_col.download_button(
+                    label="Download",
+                    data=open(zip_path, "rb").read(),
+                    file_name="images.zip",
+                    mime="application/zip",
+                )
+            else:
+                ste.download_button(
+                    label="Download",
+                    data=open(zip_path, "rb").read(),
+                    file_name="images.zip",
+                    mime="application/zip",
+                )
 
             _ = clickable_images(
                 gallery_images,

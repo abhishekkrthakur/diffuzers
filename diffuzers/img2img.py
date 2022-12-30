@@ -28,6 +28,9 @@ class Img2Img:
     output_path: Optional[str] = None
     text2img_model: Optional[Union[StableDiffusionPipeline, AltDiffusionPipeline]] = None
 
+    def __str__(self) -> str:
+        return f"Img2Img(model={self.model}, device={self.device}, output_path={self.output_path})"
+
     def __post_init__(self):
         if self.model is not None:
             self.text2img_model = DiffusionPipeline.from_pretrained(
@@ -123,22 +126,23 @@ class Img2Img:
             input_image = Image.open(input_image)
             st.image(input_image, use_column_width=True)
 
-        with st.form(key="img2img"):
-            col1, col2 = st.columns(2)
-            with col1:
-                prompt = st.text_area("Prompt", "")
-            with col2:
-                negative_prompt = st.text_area("Negative Prompt", "")
+        # with st.form(key="img2img"):
+        col1, col2 = st.columns(2)
+        with col1:
+            prompt = st.text_area("Prompt", "")
+        with col2:
+            negative_prompt = st.text_area("Negative Prompt", "")
 
-            scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
-            image_size = st.sidebar.slider("Image size", 256, 1024, 512, 256)
-            guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
-            strength = st.sidebar.slider("Strength", 0.0, 1.0, 0.8, 0.05)
-            num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
-            steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
-            seed = st.sidebar.slider("Seed", 1, 999999, 1, 1)
-
-            submit = st.form_submit_button("Generate")
+        scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
+        image_size = st.sidebar.slider("Image size", 256, 1024, 512, 256)
+        guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
+        strength = st.sidebar.slider("Strength", 0.0, 1.0, 0.8, 0.05)
+        num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
+        steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
+        seed = st.sidebar.slider("Seed", 1, 999999, 1, 1)
+        sub_col, download_col = st.columns(2)
+        with sub_col:
+            submit = st.button("Generate")
 
         if submit:
             with st.spinner("Generating images..."):
@@ -155,4 +159,4 @@ class Img2Img:
                     strength=strength,
                 )
 
-            utils.display_and_download_images(output_images, metadata)
+            utils.display_and_download_images(output_images, metadata, download_col)

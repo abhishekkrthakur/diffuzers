@@ -8,9 +8,7 @@ from . import BaseDiffuzersCommand
 
 def run_app_command_factory(args):
     return RunDiffuzersAppCommand(
-        args.model,
-        args.inpainting_model,
-        args.output_path,
+        args.output,
         args.share,
         args.port,
         args.host,
@@ -26,20 +24,7 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
             description="✨ Run diffuzers app",
         )
         run_app_parser.add_argument(
-            "--model",
-            type=str,
-            required=True,
-            help="Path to model. This model will be used for text2img and img2img tasks.",
-        )
-        run_app_parser.add_argument(
-            "--inpainting_model",
-            type=str,
-            required=False,
-            help="Inpainting/Outpainting model. If not provided, the default model will be used which is sd2.0 inpainting model",
-            default="stabilityai/stable-diffusion-2-inpainting",
-        )
-        run_app_parser.add_argument(
-            "--output_path",
+            "--output",
             type=str,
             required=False,
             help="Output path is optional, but if provided, all generations will automatically be saved to this path.",
@@ -71,10 +56,8 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
         )
         run_app_parser.set_defaults(func=run_app_command_factory)
 
-    def __init__(self, model, inpainting_model, output_path, share, port, host, device):
-        self.model = model
-        self.inpainting_model = inpainting_model
-        self.output_path = output_path
+    def __init__(self, output, share, port, host, device):
+        self.output = output
         self.share = share
         self.port = port
         self.host = host
@@ -87,12 +70,12 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
         # from ..app import Diffuzers
 
         # print(self.share)
-        # app = Diffuzers(self.model, self.output_path).app()
+        # app = Diffuzers(self.model, self.output).app()
         # app.launch(show_api=False, share=self.share, server_port=self.port, server_name=self.host)
         import os
 
         dirname = os.path.dirname(__file__)
-        filename = os.path.join(dirname, "..", "app.py")
+        filename = os.path.join(dirname, "..", "Home.py")
         cmd = [
             "streamlit",
             "run",
@@ -106,14 +89,10 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
             "--theme.base",
             "light",
             "--",
-            "--model",
-            self.model,
-            "--inpainting_model",
-            self.inpainting_model,
             "--device",
             self.device,
         ]
-        if self.output_path is not None:
-            cmd.extend(["--output_path", self.output_path])
+        if self.output is not None:
+            cmd.extend(["--output", self.output])
 
         subprocess.run(cmd)

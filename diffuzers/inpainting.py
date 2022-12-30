@@ -22,6 +22,9 @@ class Inpainting:
     device: Optional[str] = None
     output_path: Optional[str] = None
 
+    def __str__(self) -> str:
+        return f"Inpainting(model={self.model}, device={self.device}, output_path={self.output_path})"
+
     def __post_init__(self):
         self.pipeline = StableDiffusionInpaintPipeline.from_pretrained(
             self.model,
@@ -111,7 +114,7 @@ class Inpainting:
         with col2:
             negative_prompt = st.text_area("Negative Prompt", "")
 
-        uploaded_file = st.sidebar.file_uploader(
+        uploaded_file = st.file_uploader(
             "Image:", type=["png", "jpg", "jpeg"], help="Image size must match model's image size. Usually: 512 or 768"
         )
 
@@ -132,6 +135,7 @@ class Inpainting:
             stroke_width = st.slider("Stroke width: ", 1, 25, 8)
             pil_image = Image.open(uploaded_file).convert("RGB")
             img_height, img_width = pil_image.size
+            print(img_height, img_width)
             canvas_result = st_canvas(
                 fill_color="rgb(255, 255, 255)",
                 stroke_width=stroke_width,
@@ -139,9 +143,9 @@ class Inpainting:
                 background_color=bg_color,
                 background_image=pil_image,
                 update_streamlit=True,
+                drawing_mode=drawing_mode,
                 height=768,
                 width=768,
-                drawing_mode=drawing_mode,
                 key="canvas",
             )
             submit = st.button("Generate")
@@ -155,7 +159,7 @@ class Inpainting:
                 # convert mask npy to PIL image
                 mask_pil = Image.fromarray(mask_npy).convert("RGB")
                 # resize mask to match image size
-                mask_pil = mask_pil.resize((img_width, img_height), resample=Image.Resampling.LANCZOS)
+                mask_pil = mask_pil.resize((img_width, img_height), resample=Image.LANCZOS)
                 with st.spinner("Generating..."):
                     output_images, metadata = self.generate_image(
                         prompt=prompt,

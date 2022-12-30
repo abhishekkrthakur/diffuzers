@@ -18,6 +18,9 @@ class Text2Image:
     model: Optional[str] = None
     output_path: Optional[str] = None
 
+    def __str__(self) -> str:
+        return f"Text2Image(model={self.model}, device={self.device}, output_path={self.output_path})"
+
     def __post_init__(self):
         self.pipeline = DiffusionPipeline.from_pretrained(
             self.model,
@@ -85,20 +88,22 @@ class Text2Image:
             available_schedulers.insert(
                 0, available_schedulers.pop(available_schedulers.index("EulerAncestralDiscreteScheduler"))
             )
-        with st.form(key="text2img"):
-            col1, col2 = st.columns(2)
-            with col1:
-                prompt = st.text_area("Prompt", "Blue elephant")
-            with col2:
-                negative_prompt = st.text_area("Negative Prompt", "")
-            # sidebar options
-            scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
-            image_size = st.sidebar.slider("Image size", 256, 1024, 512, 256)
-            guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
-            num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
-            steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
-            seed = st.sidebar.slider("Seed", 1, 999999, 1, 1)
-            submit = st.form_submit_button("Generate")
+        # with st.form(key="text2img"):
+        col1, col2 = st.columns(2)
+        with col1:
+            prompt = st.text_area("Prompt", "Blue elephant")
+        with col2:
+            negative_prompt = st.text_area("Negative Prompt", "")
+        # sidebar options
+        scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
+        image_size = st.sidebar.slider("Image size", 256, 1024, 512, 256)
+        guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
+        num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
+        steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
+        seed = st.sidebar.slider("Seed", 1, 999999, 1, 1)
+        sub_col, download_col = st.columns(2)
+        with sub_col:
+            submit = st.button("Generate")
 
         if submit:
             with st.spinner("Generating images..."):
@@ -113,4 +118,4 @@ class Text2Image:
                     seed=seed,
                 )
 
-            utils.display_and_download_images(output_images, metadata)
+            utils.display_and_download_images(output_images, metadata, download_col)
