@@ -27,6 +27,12 @@ def download_file(file_url):
     return tmp.name
 
 
+def cache_folder():
+    _cache_folder = os.path.join(os.path.expanduser("~"), ".diffuzers")
+    os.makedirs(_cache_folder, exist_ok=True)
+    return _cache_folder
+
+
 def clear_memory(preserve):
     torch.cuda.empty_cache()
     gc.collect()

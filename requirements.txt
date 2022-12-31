@@ -1,6 +1,11 @@
 accelerate==0.15.0
+basicsr>=1.4.2
 diffusers>=0.11.1
+facexlib>=0.2.5
+gfpgan>=1.3.7
 loguru==0.6.0
+opencv-python
+realesrgan>=0.2.5
 streamlit==1.16.0
 streamlit-drawable-canvas==0.9.0
 streamlit-ext==0.1.5
