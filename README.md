@@ -4,7 +4,7 @@ A web ui for [🤗 diffusers](https://github.com/huggingface/diffusers).
 
 < under development, request features using issues, prs not accepted atm >
 
-![image](static/screenshot_st.png)
+![image](https://github.com/abhishekkrthakur/diffuzers/raw/main/static/screenshot.png)
 
 
 ## Installation
