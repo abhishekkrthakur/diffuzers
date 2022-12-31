@@ -6,7 +6,10 @@ examples/.logs/
 input/
 models/
 logs/
-
+gfpgan/
+*.pkl
+*.pt
+*.pth
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
