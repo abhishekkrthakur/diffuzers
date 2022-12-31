@@ -6,6 +6,18 @@ A web ui for [🤗 diffusers](https://github.com/huggingface/diffusers).
 
 ![image](https://github.com/abhishekkrthakur/diffuzers/raw/main/static/screenshot.png)
 
+## Features:
+
+- text to image
+- image to image
+- textual inversion
+- inpainting
+- outpainting (coming soon)
+- image info
+- stable diffusion upscaler
+- gfpgan
+- need more? create an [issue](https://github.com/abhishekkrthakur/diffuzers/issues)
+
 
 ## Installation
 
