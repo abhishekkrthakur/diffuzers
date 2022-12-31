@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.7.1-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu20.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV PATH="${HOME}/miniconda3/bin:${PATH}"

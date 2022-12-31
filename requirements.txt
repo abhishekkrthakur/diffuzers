@@ -11,4 +11,5 @@ streamlit-drawable-canvas==0.9.0
 streamlit-ext==0.1.5
 st-clickable-images==0.0.3
 torch>=1.12.0
+torchvision>=0.13.0
 transformers==4.25.1

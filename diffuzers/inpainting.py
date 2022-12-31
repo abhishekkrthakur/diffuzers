@@ -133,14 +133,18 @@ class Inpainting:
         guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
         num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
         steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
-        seed = st.sidebar.slider("Seed", 1, 999999, 1, 1)
+        seed_placeholder = st.sidebar.empty()
+        seed = seed_placeholder.number_input("Seed", value=42, min_value=1, max_value=999999, step=1)
+        random_seed = st.sidebar.button("Random seed")
+        _seed = torch.randint(1, 999999, (1,)).item()
+        if random_seed:
+            seed = seed_placeholder.number_input("Seed", value=_seed, min_value=1, max_value=999999, step=1)
 
         if uploaded_file is not None:
             drawing_mode = st.selectbox("Drawing tool:", ("freedraw", "rect", "circle"))
             stroke_width = st.slider("Stroke width: ", 1, 25, 8)
             pil_image = Image.open(uploaded_file).convert("RGB")
             img_height, img_width = pil_image.size
-            print(img_height, img_width)
             canvas_result = st_canvas(
                 fill_color="rgb(255, 255, 255)",
                 stroke_width=stroke_width,

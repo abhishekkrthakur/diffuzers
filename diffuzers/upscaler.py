@@ -112,7 +112,12 @@ class Upscaler:
         eta = st.sidebar.slider("Eta", 0.0, 1.0, 0.0, 0.1)
         num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
         steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
-        seed = st.sidebar.slider("Seed", 1, 999999, 1, 1)
+        seed_placeholder = st.sidebar.empty()
+        seed = seed_placeholder.number_input("Seed", value=42, min_value=1, max_value=999999, step=1)
+        random_seed = st.sidebar.button("Random seed")
+        _seed = torch.randint(1, 999999, (1,)).item()
+        if random_seed:
+            seed = seed_placeholder.number_input("Seed", value=_seed, min_value=1, max_value=999999, step=1)
         sub_col, download_col = st.columns(2)
         with sub_col:
             submit = st.button("Generate")

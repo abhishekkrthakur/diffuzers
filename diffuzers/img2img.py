@@ -73,7 +73,7 @@ class Img2Img:
         self.pipeline.scheduler = scheduler
 
     def generate_image(
-        self, prompt, image, strength, negative_prompt, scheduler, image_size, num_images, guidance_scale, steps, seed
+        self, prompt, image, strength, negative_prompt, scheduler, num_images, guidance_scale, steps, seed
     ):
         self._set_scheduler(scheduler)
         logger.info(self.pipeline.scheduler)
@@ -99,7 +99,6 @@ class Img2Img:
             "prompt": prompt,
             "negative_prompt": negative_prompt,
             "scheduler": scheduler,
-            "image_size": image_size,
             "num_images": num_images,
             "guidance_scale": guidance_scale,
             "steps": steps,
@@ -138,12 +137,17 @@ class Img2Img:
             negative_prompt = st.text_area("Negative Prompt", "")
 
         scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
-        image_size = st.sidebar.slider("Image size", 256, 1024, 512, 256)
         guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
         strength = st.sidebar.slider("Strength", 0.0, 1.0, 0.8, 0.05)
         num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
         steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
-        seed = st.sidebar.slider("Seed", 1, 999999, 1, 1)
+        seed_placeholder = st.sidebar.empty()
+        seed = seed_placeholder.number_input("Seed", value=42, min_value=1, max_value=999999, step=1)
+        random_seed = st.sidebar.button("Random seed")
+        _seed = torch.randint(1, 999999, (1,)).item()
+        if random_seed:
+            seed = seed_placeholder.number_input("Seed", value=_seed, min_value=1, max_value=999999, step=1)
+        # seed = st.sidebar.number_input("Seed", 1, 999999, 1, 1)
         sub_col, download_col = st.columns(2)
         with sub_col:
             submit = st.button("Generate")
@@ -155,7 +159,6 @@ class Img2Img:
                     image=input_image,
                     negative_prompt=negative_prompt,
                     scheduler=scheduler,
-                    image_size=image_size,
                     num_images=num_images,
                     guidance_scale=guidance_scale,
                     steps=steps,

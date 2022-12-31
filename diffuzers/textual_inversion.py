@@ -94,8 +94,8 @@ class TextualInversion:
         output_images = self.pipeline(
             prompt,
             negative_prompt=negative_prompt,
-            width=image_size,
-            height=image_size,
+            width=image_size[1],
+            height=image_size[0],
             num_inference_steps=steps,
             guidance_scale=guidance_scale,
             num_images_per_prompt=num_images,
@@ -139,11 +139,17 @@ class TextualInversion:
             negative_prompt = st.text_area("Negative Prompt", "")
         # sidebar options
         scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
-        image_size = st.sidebar.slider("Image size", 256, 1024, 512, 256)
+        image_height = st.sidebar.slider("Image height", 128, 1024, 512, 128)
+        image_width = st.sidebar.slider("Image width", 128, 1024, 512, 128)
         guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
         num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
         steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
-        seed = st.sidebar.slider("Seed", 1, 999999, 1, 1)
+        seed_placeholder = st.sidebar.empty()
+        seed = seed_placeholder.number_input("Seed", value=42, min_value=1, max_value=999999, step=1)
+        random_seed = st.sidebar.button("Random seed")
+        _seed = torch.randint(1, 999999, (1,)).item()
+        if random_seed:
+            seed = seed_placeholder.number_input("Seed", value=_seed, min_value=1, max_value=999999, step=1)
         sub_col, download_col = st.columns(2)
         with sub_col:
             submit = st.button("Generate")
@@ -154,7 +160,7 @@ class TextualInversion:
                     prompt=prompt,
                     negative_prompt=negative_prompt,
                     scheduler=scheduler,
-                    image_size=image_size,
+                    image_size=(image_height, image_width),
                     num_images=num_images,
                     guidance_scale=guidance_scale,
                     steps=steps,
