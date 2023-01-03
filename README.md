@@ -4,7 +4,7 @@ A web ui for [🤗 diffusers](https://github.com/huggingface/diffusers).
 
 < under development, request features using issues, prs not accepted atm >
 
-<a target="_blank" href="https://colab.research.google.com/github/abhishekkrthakur/diffuzers/blob/main/colab.ipynb">
+<a target="_blank" href="https://colab.research.google.com/github/abhishekkrthakur/diffuzers/blob/main/diffuzers.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
