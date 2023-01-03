@@ -38,7 +38,7 @@ class Img2Img:
                 torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
             )
         components = self.text2img_model.components
-
+        print(components)
         if isinstance(self.text2img_model, StableDiffusionPipeline):
             self.pipeline = StableDiffusionImg2ImgPipeline(**components)
         elif isinstance(self.text2img_model, AltDiffusionPipeline):

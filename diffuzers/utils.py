@@ -14,8 +14,7 @@ from PIL.PngImagePlugin import PngInfo
 from st_clickable_images import clickable_images
 
 
-def no_safety_checker(images, **kwargs):
-    return images, False
+no_safety_checker = None
 
 
 def download_file(file_url):
