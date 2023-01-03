@@ -5,6 +5,7 @@ facexlib>=0.2.5
 gfpgan>=1.3.7
 loguru==0.6.0
 opencv-python
+protobuf==3.20
 pyngrok==5.2.1
 realesrgan>=0.2.5
 streamlit==1.16.0
