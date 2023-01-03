@@ -2,6 +2,7 @@ import subprocess
 from argparse import ArgumentParser
 
 import torch
+from pyngrok import ngrok
 
 from . import BaseDiffuzersCommand
 
@@ -13,6 +14,7 @@ def run_app_command_factory(args):
         args.port,
         args.host,
         args.device,
+        args.ngrok_key,
     )
 
 
@@ -54,17 +56,30 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
             required=False,
             help="Device to use, e.g. cpu, cuda, cuda:0, mps (for m1 mac) etc.",
         )
+        run_app_parser.add_argument(
+            "--ngrok_key",
+            type=str,
+            required=False,
+            help="Ngrok key to use for sharing the app. Only required if you want to share the app",
+        )
         run_app_parser.set_defaults(func=run_app_command_factory)
 
-    def __init__(self, output, share, port, host, device):
+    def __init__(self, output, share, port, host, device, ngrok_key):
         self.output = output
         self.share = share
         self.port = port
         self.host = host
         self.device = device
+        self.ngrok_key = ngrok_key
 
         if self.device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        if self.share:
+            if self.ngrok_key is None:
+                raise ValueError(
+                    "ngrok key is required if you want to share the app. Get it for free from https://dashboard.ngrok.com/get-started/your-authtoken"
+                )
 
     def run(self):
         # from ..app import Diffuzers
@@ -95,4 +110,28 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
         if self.output is not None:
             cmd.extend(["--output", self.output])
 
-        subprocess.run(cmd)
+        if self.share:
+            ngrok.set_auth_token(self.ngrok_key)
+            public_url = ngrok.connect(self.port).public_url
+            print(f"Sharing app at {public_url}")
+
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            shell=False,
+            universal_newlines=True,
+            bufsize=1,
+        )
+        with proc as p:
+            try:
+                for line in p.stdout:
+                    print(line, end="")
+            except KeyboardInterrupt:
+                print("Killing streamlit app")
+                p.kill()
+                if self.share:
+                    print("Killing ngrok tunnel")
+                    ngrok.kill()
+                p.wait()
+                raise
