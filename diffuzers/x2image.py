@@ -1,5 +1,8 @@
+import base64
 import gc
 import json
+import os
+import tempfile
 from dataclasses import dataclass
 from io import BytesIO
 from typing import Optional
@@ -17,6 +20,7 @@ from diffusers import (
 from loguru import logger
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
+from st_clickable_images import clickable_images
 
 from diffuzers import utils
 
@@ -233,22 +237,41 @@ class X2Image:
             available_schedulers.insert(
                 0, available_schedulers.pop(available_schedulers.index("EulerAncestralDiscreteScheduler"))
             )
-        col1, col2 = st.columns(2)
-        with col1:
-            prompt = st.text_area("Prompt", "Blue elephant")
-        with col2:
-            negative_prompt = st.text_area("Negative Prompt", "")
-
+        # col3, col4 = st.columns(2)
+        # with col3:
         input_image = st.file_uploader(
             "Upload an image to use image2image instead (optional)", type=["png", "jpg", "jpeg"]
         )
         if input_image is not None:
             input_image = Image.open(input_image)
             pipeline_name = "img2img"
-            st.image(input_image, use_column_width=True)
+            # display image using html
+            # convert image to base64
+            # st.markdown(f"<img src='data:image/png;base64,{input_image}' width='200'>", unsafe_allow_html=True)
+            # st.image(input_image, use_column_width=True)
+            with tempfile.TemporaryDirectory() as tmpdir:
+                gallery_images = []
+                input_image.save(os.path.join(tmpdir, "img.png"))
+                with open(os.path.join(tmpdir, "img.png"), "rb") as img:
+                    encoded = base64.b64encode(img.read()).decode()
+                    gallery_images.append(f"data:image/jpeg;base64,{encoded}")
+
+                _ = clickable_images(
+                    gallery_images,
+                    titles=[f"Image #{str(i)}" for i in range(len(gallery_images))],
+                    div_style={"display": "flex", "justify-content": "center", "flex-wrap": "wrap"},
+                    img_style={"margin": "5px", "height": "200px"},
+                )
         else:
             pipeline_name = "text2img"
-
+        # prompt = st.text_area("Prompt", "Blue elephant")
+        # negative_prompt = st.text_area("Negative Prompt", "")
+        # with col4:
+        col1, col2 = st.columns(2)
+        with col1:
+            prompt = st.text_area("Prompt", "Blue elephant")
+        with col2:
+            negative_prompt = st.text_area("Negative Prompt", "")
         # sidebar options
         scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
         image_height = st.sidebar.slider("Image height (ignored for img2img)", 128, 1024, 512, 128)
@@ -258,13 +281,7 @@ class X2Image:
         num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
         steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
 
-        seed_placeholder = st.sidebar.empty()
-        seed = seed_placeholder.number_input("Seed", value=42, min_value=1, max_value=999999, step=1)
-        random_seed = st.sidebar.button("Random seed")
-        _seed = torch.randint(1, 999999, (1,)).item()
-        if random_seed:
-            seed = seed_placeholder.number_input("Seed", value=_seed, min_value=1, max_value=999999, step=1)
-
+        seed = st.sidebar.number_input("Seed", value=42, min_value=1, max_value=999999, step=1)
         sub_col, download_col = st.columns(2)
         with sub_col:
             submit = st.button("Generate")
