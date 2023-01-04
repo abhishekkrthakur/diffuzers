@@ -3,6 +3,7 @@ import streamlit as st
 from diffuzers import utils
 from diffuzers.gfp_gan import GFPGAN
 from diffuzers.image_info import ImageInfo
+from diffuzers.interrogator import ImageInterrogator
 from diffuzers.upscaler import Upscaler
 
 
@@ -14,6 +15,7 @@ def app():
             "ImageInfo",
             "SD Upscaler",
             "GFPGAN",
+            "CLIP Interrogator",
         ],
     )
     if task == "ImageInfo":
@@ -41,6 +43,12 @@ def app():
                 output_path=st.session_state.output_path,
             )
         gfpgan.app()
+    elif task == "CLIP Interrogator":
+        interrogator = ImageInterrogator(
+            device=st.session_state.device,
+            output_path=st.session_state.output_path,
+        )
+        interrogator.app()
 
 
 if __name__ == "__main__":

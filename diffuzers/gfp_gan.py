@@ -139,7 +139,7 @@ class GFPGAN:
     def app(self):
         input_image = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
         if input_image is not None:
-            st.image(input_image, use_column_width=True)
+            st.image(input_image, width=512)
         with st.form(key="gfpgan"):
             version = st.selectbox("GFPGAN version", ["v1.2", "v1.3", "v1.4", "RestoreFormer"])
             scale = st.slider("Scale", 2, 4, 4, 1)
@@ -148,7 +148,7 @@ class GFPGAN:
             if input_image is not None:
                 with st.spinner("Upscaling image..."):
                     output_img = self.inference(input_image, version, scale)
-                    st.image(output_img, use_column_width=True)
+                    st.image(output_img, width=512)
                     # add image download button
                     output_img = Image.fromarray(output_img)
                     buffered = BytesIO()

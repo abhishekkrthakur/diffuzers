@@ -20,6 +20,7 @@ A web ui for [🤗 diffusers](https://github.com/huggingface/diffusers).
 - image info
 - stable diffusion upscaler
 - gfpgan
+- clip interrogator
 - need more? create an [issue](https://github.com/abhishekkrthakur/diffuzers/issues)
 
 

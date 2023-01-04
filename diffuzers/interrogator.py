@@ -13,11 +13,10 @@ from diffuzers import utils
 
 @dataclass
 class ImageInterrogator:
-    model: str
     device: Optional[str] = None
     output_path: Optional[str] = None
 
-    def __post_init__(self):
+    def inference(self, model, image, mode):
         preprocess_files = [
             "ViT-H-14_laion2b_s32b_b79k_artists.pkl",
             "ViT-H-14_laion2b_s32b_b79k_flavors.pkl",
@@ -36,17 +35,40 @@ class ImageInterrogator:
             path = hf_hub_download(repo_id="pharma/ci-preprocess", filename=file, cache_dir=utils.cache_folder())
             cache_path = os.path.dirname(path)
 
-        config = Config(cache_path=cache_path, clip_model_path=utils.cache_folder(), clip_model_name=self.model)
-        self.pipeline = Interrogator(config)
+        config = Config(cache_path=cache_path, clip_model_path=utils.cache_folder(), clip_model_name=model)
+        pipeline = Interrogator(config)
 
-        self.pipeline.config.blip_num_beams = 64
-        self.pipeline.config.chunk_size = 2048
-        self.pipeline.config.flavor_intermediate_count = 2048 if self.model == "ViT-L-14/openai" else 1024
+        pipeline.config.blip_num_beams = 64
+        pipeline.config.chunk_size = 2048
+        pipeline.config.flavor_intermediate_count = 2048 if model == "ViT-L-14/openai" else 1024
+
+        if mode == "best":
+            prompt = pipeline.interrogate(image)
+        elif mode == "classic":
+            prompt = pipeline.interrogate_classic(image)
+        else:
+            prompt = pipeline.interrogate_fast(image)
+        return prompt
 
     def app(self):
         # upload image
-        uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
-        if uploaded_file is not None:
-            # read image using pil
-            pil_image = Image.open(uploaded_file)
-            st.image(uploaded_file, use_column_width=True)
+        input_image = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
+        with st.form(key="image_interrogator"):
+            clip_model = st.selectbox("CLIP Model", ["ViT-L (Best for SD1.X)", "ViT-H (Best for SD2.X)"])
+            mode = st.selectbox("Mode", ["Best", "Classic"])
+            submit = st.form_submit_button("Interrogate")
+            if input_image is not None:
+                # read image using pil
+                pil_image = Image.open(input_image).convert("RGB")
+            if submit:
+                with st.spinner("Interrogating image..."):
+                    if clip_model == "ViT-L (Best for SD1.X)":
+                        model = "ViT-L-14/openai"
+                    else:
+                        model = "ViT-H-14/laion2b_s32b_b79k"
+                    prompt = self.inference(model, pil_image, mode.lower())
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.image(input_image, use_column_width=True)
+                with col2:
+                    st.write(prompt)
