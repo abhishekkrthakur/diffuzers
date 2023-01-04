@@ -1,12 +1,14 @@
 import streamlit as st
 
+from diffuzers import utils
 from diffuzers.inpainting import Inpainting
 
 
 def app():
-    with st.form("inpainting_model"):
+    utils.create_base_page()
+    with st.form("inpainting_model_form"):
         model = st.text_input(
-            "Which model do you want to use?",
+            "Which model do you want to use for inpainting?",
             value="runwayml/stable-diffusion-inpainting"
             if st.session_state.get("inpainting_model") is None
             else st.session_state.inpainting_model,

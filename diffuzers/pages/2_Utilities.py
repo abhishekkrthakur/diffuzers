@@ -1,11 +1,13 @@
 import streamlit as st
 
+from diffuzers import utils
 from diffuzers.gfp_gan import GFPGAN
 from diffuzers.image_info import ImageInfo
 from diffuzers.upscaler import Upscaler
 
 
 def app():
+    utils.create_base_page()
     task = st.selectbox(
         "Choose a utility",
         [
@@ -14,8 +16,6 @@ def app():
             "GFPGAN",
         ],
     )
-    # add a line break
-    st.markdown("<hr>", unsafe_allow_html=True)
     if task == "ImageInfo":
         ImageInfo().app()
     elif task == "SD Upscaler":

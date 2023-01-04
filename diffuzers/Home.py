@@ -3,25 +3,8 @@ import argparse
 import streamlit as st
 from loguru import logger
 
-
-CODE_OF_CONDUCT = """
-## Code of conduct
-The app should not be used to intentionally create or disseminate images that create hostile or alienating environments for people. This includes generating images that people would foreseeably find disturbing, distressing, or offensive; or content that propagates historical or current stereotypes.
-
-Using the app to generate content that is cruel to individuals is a misuse of this app. One shall not use this app to generate content that is intended to be cruel to individuals, or to generate content that is intended to be cruel to individuals in a way that is not obvious to the viewer.
-This includes, but is not limited to:
-- Generating demeaning, dehumanizing, or otherwise harmful representations of people or their environments, cultures, religions, etc.
-- Intentionally promoting or propagating discriminatory content or harmful stereotypes.
-- Impersonating individuals without their consent.
-- Sexual content without consent of the people who might see it.
-- Mis- and disinformation
-- Representations of egregious violence and gore
-- Sharing of copyrighted or licensed material in violation of its terms of use.
-- Sharing content that is an alteration of copyrighted or licensed material in violation of its terms of use.
-
-By using this app, you agree to the above code of conduct.
-
-"""
+from diffuzers import utils
+from diffuzers.x2image import X2Image
 
 
 def parse_args():
@@ -42,11 +25,65 @@ def parse_args():
     return parser.parse_args()
 
 
+def x2img_app():
+    with st.form("x2img_model_form"):
+        col1, col2 = st.columns(2)
+        with col1:
+            model = st.text_input(
+                "Which model do you want to use?",
+                value="stabilityai/stable-diffusion-2-base"
+                if st.session_state.get("x2img_model") is None
+                else st.session_state.x2img_model,
+            )
+        with col2:
+            custom_pipeline = st.selectbox(
+                "Custom pipeline",
+                options=[
+                    "Vanilla",
+                    "Long Prompt Weighting",
+                ],
+                index=0 if st.session_state.get("x2img_custom_pipeline") in (None, "Vanilla") else 1,
+            )
+
+        with st.expander("Textual Inversion (Optional)"):
+            token_identifier = st.text_input(
+                "Token identifier",
+                placeholder="<something>"
+                if st.session_state.get("textual_inversion_token_identifier") is None
+                else st.session_state.textual_inversion_token_identifier,
+            )
+            embeddings = st.text_input(
+                "Embeddings",
+                placeholder="https://huggingface.co/sd-concepts-library/axe-tattoo/resolve/main/learned_embeds.bin"
+                if st.session_state.get("textual_inversion_embeddings") is None
+                else st.session_state.textual_inversion_embeddings,
+            )
+        submit = st.form_submit_button("Load model")
+
+    if submit:
+        st.session_state.x2img_model = model
+        st.session_state.x2img_custom_pipeline = custom_pipeline
+        st.session_state.textual_inversion_token_identifier = token_identifier
+        st.session_state.textual_inversion_embeddings = embeddings
+        cpipe = "lpw_stable_diffusion" if custom_pipeline == "Long Prompt Weighting" else None
+        with st.spinner("Loading model..."):
+            x2img = X2Image(
+                model=model,
+                device=st.session_state.device,
+                output_path=st.session_state.output_path,
+                custom_pipeline=cpipe,
+                token_identifier=token_identifier,
+                embeddings_url=embeddings,
+            )
+            st.session_state.x2img = x2img
+    if "x2img" in st.session_state:
+        st.write(f"Current model: {st.session_state.x2img}")
+        st.session_state.x2img.app()
+
+
 def run_app():
-    st.title("Diffuzers")
-    st.markdown("Welcome to Diffuzers! A web app for [🤗 Diffusers](https://github.com/huggingface/diffusers)")
-    st.markdown("")
-    st.markdown(CODE_OF_CONDUCT)
+    utils.create_base_page()
+    x2img_app()
 
 
 if __name__ == "__main__":
@@ -55,5 +92,4 @@ if __name__ == "__main__":
     logger.info(st.session_state)
     st.session_state.device = args.device
     st.session_state.output_path = args.output
-    # text2img, img2img, inpainting = get_models(args)
     run_app()

@@ -115,12 +115,15 @@ class Inpainting:
         bg_color = "#000"
         col1, col2 = st.columns(2)
         with col1:
-            prompt = st.text_area("Prompt", "")
+            prompt = st.text_area("Prompt", "", key="inpainting_prompt")
         with col2:
-            negative_prompt = st.text_area("Negative Prompt", "")
+            negative_prompt = st.text_area("Negative Prompt", "", key="inpainting_negative_prompt")
 
         uploaded_file = st.file_uploader(
-            "Image:", type=["png", "jpg", "jpeg"], help="Image size must match model's image size. Usually: 512 or 768"
+            "Image:",
+            type=["png", "jpg", "jpeg"],
+            help="Image size must match model's image size. Usually: 512 or 768",
+            key="inpainting_uploaded_file",
         )
 
         # sidebar options
@@ -129,20 +132,17 @@ class Inpainting:
             available_schedulers.insert(
                 0, available_schedulers.pop(available_schedulers.index("EulerAncestralDiscreteScheduler"))
             )
-        scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
-        guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
-        num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
-        steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
+        scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0, key="inpainting_scheduler")
+        guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5, key="inpainting_guidance_scale")
+        num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1, key="inpainting_num_images")
+        steps = st.sidebar.slider("Steps", 1, 150, 50, 1, key="inpainting_steps")
         seed_placeholder = st.sidebar.empty()
-        seed = seed_placeholder.number_input("Seed", value=42, min_value=1, max_value=999999, step=1)
-        random_seed = st.sidebar.button("Random seed")
-        _seed = torch.randint(1, 999999, (1,)).item()
-        if random_seed:
-            seed = seed_placeholder.number_input("Seed", value=_seed, min_value=1, max_value=999999, step=1)
-
+        seed = seed_placeholder.number_input(
+            "Seed", value=42, min_value=1, max_value=999999, step=1, key="inpainting_seed"
+        )
         if uploaded_file is not None:
-            drawing_mode = st.selectbox("Drawing tool:", ("freedraw", "rect", "circle"))
-            stroke_width = st.slider("Stroke width: ", 1, 25, 8)
+            drawing_mode = st.selectbox("Drawing tool:", ("freedraw", "rect", "circle"), key="inpainting_drawing_mode")
+            stroke_width = st.slider("Stroke width: ", 1, 25, 8, key="inpainting_stroke_width")
             pil_image = Image.open(uploaded_file).convert("RGB")
             img_height, img_width = pil_image.size
             canvas_result = st_canvas(
@@ -155,9 +155,9 @@ class Inpainting:
                 drawing_mode=drawing_mode,
                 height=768,
                 width=768,
-                key="canvas",
+                key="inpainting_canvas",
             )
-            submit = st.button("Generate")
+            submit = st.button("Generate", key="inpainting_submit")
             if (
                 canvas_result.image_data is not None
                 and pil_image

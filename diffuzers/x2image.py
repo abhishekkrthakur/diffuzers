@@ -21,12 +21,43 @@ from PIL.PngImagePlugin import PngInfo
 from diffuzers import utils
 
 
+def load_embed(learned_embeds_path, text_encoder, tokenizer, token=None):
+    loaded_learned_embeds = torch.load(learned_embeds_path, map_location="cpu")
+    if len(loaded_learned_embeds) > 2:
+        embeds = loaded_learned_embeds["string_to_param"]["*"][-1, :]
+    else:
+        # separate token and the embeds
+        trained_token = list(loaded_learned_embeds.keys())[0]
+        embeds = loaded_learned_embeds[trained_token]
+
+    # add the token in tokenizer
+    token = token if token is not None else trained_token
+    num_added_tokens = tokenizer.add_tokens(token)
+    i = 1
+    while num_added_tokens == 0:
+        logger.warning(f"The tokenizer already contains the token {token}.")
+        token = f"{token[:-1]}-{i}>"
+        logger.info(f"Attempting to add the token {token}.")
+        num_added_tokens = tokenizer.add_tokens(token)
+        i += 1
+
+    # resize the token embeddings
+    text_encoder.resize_token_embeddings(len(tokenizer))
+
+    # get the id for the token and assign the embeds
+    token_id = tokenizer.convert_tokens_to_ids(token)
+    text_encoder.get_input_embeddings().weight.data[token_id] = embeds
+    return token
+
+
 @dataclass
 class X2Image:
     device: Optional[str] = None
     model: Optional[str] = None
     output_path: Optional[str] = None
     custom_pipeline: Optional[str] = None
+    embeddings_url: Optional[str] = None
+    token_identifier: Optional[str] = None
 
     def __str__(self) -> str:
         return f"X2Image(model={self.model}, pipeline={self.custom_pipeline})"
@@ -55,6 +86,16 @@ class X2Image:
         self.compatible_schedulers = {
             scheduler.__name__: scheduler for scheduler in self.text2img_pipeline.scheduler.compatibles
         }
+
+        if len(self.embeddings_url) > 0 and len(self.token_identifier) > 0:
+            # download the embeddings
+            self.embeddings_path = utils.download_file(self.embeddings_url)
+            load_embed(
+                learned_embeds_path=self.embeddings_path,
+                text_encoder=self.pipeline.text_encoder,
+                tokenizer=self.pipeline.tokenizer,
+                token=self.token_identifier,
+            )
 
         if self.device == "mps":
             self.text2img_pipeline.enable_attention_slicing()
