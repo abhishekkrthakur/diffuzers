@@ -1,1 +1,2 @@
 include diffuzers/pages/*.py
+include diffuzers/data/*.txt
