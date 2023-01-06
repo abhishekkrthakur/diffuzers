@@ -8,7 +8,7 @@ A web ui for [🤗 diffusers](https://github.com/huggingface/diffusers).
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
-![image](https://github.com/abhishekkrthakur/diffuzers/raw/main/static/screenshot.png)
+![image](https://github.com/abhishekkrthakur/diffuzers/raw/main/static/screenshot.jpeg)
 
 ## Features:
 
