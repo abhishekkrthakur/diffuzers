@@ -13,7 +13,6 @@ pyngrok==5.2.1
 realesrgan>=0.2.5
 streamlit==1.16.0
 streamlit-drawable-canvas==0.9.0
-streamlit-ext==0.1.5
 st-clickable-images==0.0.3
 timm==0.4.12
 torch>=1.12.0

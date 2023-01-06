@@ -7,7 +7,6 @@ from datetime import datetime
 
 import requests
 import streamlit as st
-import streamlit_ext as ste
 import torch
 from loguru import logger
 from PIL.PngImagePlugin import PngInfo
@@ -111,24 +110,23 @@ def display_and_download_images(output_images, metadata, download_col=None):
                     if filename.endswith(".png"):
                         zip.write(os.path.join(tmpdir, filename), filename)
 
-            if download_col is not None:
-                download_col.download_button(
-                    label="Download",
-                    data=open(zip_path, "rb").read(),
-                    file_name="images.zip",
-                    mime="application/zip",
-                )
-            else:
-                ste.download_button(
-                    label="Download",
-                    data=open(zip_path, "rb").read(),
-                    file_name="images.zip",
-                    mime="application/zip",
-                )
+            # convert zip to base64
+            with open(zip_path, "rb") as f:
+                encoded = base64.b64encode(f.read()).decode()
 
             _ = clickable_images(
                 gallery_images,
                 titles=[f"Image #{str(i)}" for i in range(len(gallery_images))],
                 div_style={"display": "flex", "justify-content": "center", "flex-wrap": "wrap"},
                 img_style={"margin": "5px", "height": "200px"},
+            )
+
+            # add download link
+            st.markdown(
+                f"""
+                <a href="data:application/zip;base64,{encoded}" download="images.zip">
+                    Download Images
+                </a>
+                """,
+                unsafe_allow_html=True,
             )
