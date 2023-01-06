@@ -44,7 +44,7 @@ setup(
     entry_points={"console_scripts": ["diffuzers=diffuzers.cli.main:main"]},
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
-    python_requires=">=3.8",
+    python_requires=">=3.7",
     classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
