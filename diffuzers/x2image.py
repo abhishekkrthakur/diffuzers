@@ -71,6 +71,7 @@ class X2Image:
             self.model,
             torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
             custom_pipeline=self.custom_pipeline,
+            use_auth_token=utils.use_auth_token(),
         )
         components = self.text2img_pipeline.components
 

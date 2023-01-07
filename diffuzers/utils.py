@@ -36,6 +36,13 @@ By using this app, you agree to the above code of conduct.
 """
 
 
+def use_auth_token():
+    token_path = os.path.join(os.path.expanduser("~"), ".huggingface", "token")
+    if os.path.exists(token_path):
+        return True
+    return False
+
+
 def create_base_page():
     st.set_page_config(layout="wide")
     st.title("Diffuzers")

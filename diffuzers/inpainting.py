@@ -29,6 +29,7 @@ class Inpainting:
         self.pipeline = StableDiffusionInpaintPipeline.from_pretrained(
             self.model,
             torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
+            use_auth_token=utils.use_auth_token(),
         )
 
         self.pipeline.to(self.device)
