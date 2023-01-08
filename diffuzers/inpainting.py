@@ -115,17 +115,18 @@ class Inpainting:
         stroke_color = "#FFF"
         bg_color = "#000"
         col1, col2 = st.columns(2)
+        # with col1:
         with col1:
             prompt = st.text_area("Prompt", "", key="inpainting_prompt")
-        with col2:
+            # with col2:
             negative_prompt = st.text_area("Negative Prompt", "", key="inpainting_negative_prompt")
-
-        uploaded_file = st.file_uploader(
-            "Image:",
-            type=["png", "jpg", "jpeg"],
-            help="Image size must match model's image size. Usually: 512 or 768",
-            key="inpainting_uploaded_file",
-        )
+        with col2:
+            uploaded_file = st.file_uploader(
+                "Image:",
+                type=["png", "jpg", "jpeg"],
+                help="Image size must match model's image size. Usually: 512 or 768",
+                key="inpainting_uploaded_file",
+            )
 
         # sidebar options
         available_schedulers = list(self.compatible_schedulers.keys())
@@ -142,8 +143,12 @@ class Inpainting:
             "Seed", value=42, min_value=1, max_value=999999, step=1, key="inpainting_seed"
         )
         if uploaded_file is not None:
-            drawing_mode = st.selectbox("Drawing tool:", ("freedraw", "rect", "circle"), key="inpainting_drawing_mode")
-            stroke_width = st.slider("Stroke width: ", 1, 25, 8, key="inpainting_stroke_width")
+            with col2:
+                drawing_mode = st.selectbox(
+                    "Drawing tool:", ("freedraw", "rect", "circle"), key="inpainting_drawing_mode"
+                )
+                stroke_width = st.slider("Stroke width: ", 1, 25, 8, key="inpainting_stroke_width")
+
             pil_image = Image.open(uploaded_file).convert("RGB")
             img_height, img_width = pil_image.size
             canvas_result = st_canvas(
@@ -158,7 +163,9 @@ class Inpainting:
                 width=768,
                 key="inpainting_canvas",
             )
-            submit = st.button("Generate", key="inpainting_submit")
+
+            with col1:
+                submit = st.button("Generate", key="inpainting_submit")
             if (
                 canvas_result.image_data is not None
                 and pil_image
