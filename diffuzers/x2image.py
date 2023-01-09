@@ -197,7 +197,7 @@ class X2Image:
         )
         return output_images, _metadata
 
-    def img2img_generat(
+    def img2img_generate(
         self, prompt, image, strength, negative_prompt, scheduler, num_images, guidance_scale, steps, seed
     ):
         generator, num_images = self._pregen(
@@ -301,7 +301,7 @@ class X2Image:
                         seed=seed,
                     )
                 elif pipeline_name == "img2img":
-                    output_images, metadata = self.img2img_generat(
+                    output_images, metadata = self.img2img_generate(
                         prompt=prompt,
                         image=input_image,
                         strength=strength,
