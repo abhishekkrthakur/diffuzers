@@ -1,6 +1,6 @@
 # diffuzers
 
-A web ui for [🤗 diffusers](https://github.com/huggingface/diffusers).
+A web ui and deployable API for [🤗 diffusers](https://github.com/huggingface/diffusers).
 
 < under development, request features using issues, prs not accepted atm >
 
@@ -10,7 +10,11 @@ A web ui for [🤗 diffusers](https://github.com/huggingface/diffusers).
 
 ![image](https://github.com/abhishekkrthakur/diffuzers/raw/main/static/screenshot.jpeg)
 
-## Features:
+
+If something doesnt work as expected, or if you need some features which are not available, then create request using [github issues](https://github.com/abhishekkrthakur/diffuzers/issues)
+
+
+## Features available in the app:
 
 - text to image
 - image to image
@@ -21,7 +25,16 @@ A web ui for [🤗 diffusers](https://github.com/huggingface/diffusers).
 - stable diffusion upscaler
 - gfpgan
 - clip interrogator
-- need more? create an [issue](https://github.com/abhishekkrthakur/diffuzers/issues)
+- more coming soon!
+
+## Features available in the api:
+
+- text to image
+- image to image
+- textual inversion
+- inpainting
+- outpainting (via inpainting)
+- more coming soon!
 
 
 ## Installation
@@ -45,25 +58,52 @@ pip install diffuzers
 To run the web app, run the following command:
 
 ```bash
-diffuzers run
+diffuzers app
 ```
 
-## All CLI Options:
+To run the api, run the following command:
+
 
 ```bash
-❯ diffuzers run --help
+diffuzers app
+```
 
-usage: diffuzers <command> [<args>] run [-h] [--output OUTPUT] [--share] [--port PORT] [--host HOST]
-                                        [--device DEVICE]
+## All CLI Options for running the app:
+
+```bash
+❯ diffuzers app --help
+usage: diffuzers <command> [<args>] app [-h] [--output OUTPUT] [--share] [--port PORT] [--host HOST]
+                                        [--device DEVICE] [--ngrok_key NGROK_KEY]
 
 ✨ Run diffuzers app
 
 optional arguments:
-  -h, --help       show this help message and exit
-  --output OUTPUT  Output path is optional, but if provided, all generations will automatically be saved to this
-                   path.
-  --share          Share the app
-  --port PORT      Port to run the app on
-  --host HOST      Host to run the app on
-  --device DEVICE  Device to use, e.g. cpu, cuda, cuda:0, mps (for m1 mac) etc.
+  -h, --help            show this help message and exit
+  --output OUTPUT       Output path is optional, but if provided, all generations will automatically be saved to this
+                        path.
+  --share               Share the app
+  --port PORT           Port to run the app on
+  --host HOST           Host to run the app on
+  --device DEVICE       Device to use, e.g. cpu, cuda, cuda:0, mps (for m1 mac) etc.
+  --ngrok_key NGROK_KEY
+                        Ngrok key to use for sharing the app. Only required if you want to share the app
+```
+
+## All CLI Options for running the api:
+
+```bash
+❯ diffuzers api --help
+usage: diffuzers <command> [<args>] api [-h] [--output OUTPUT] [--port PORT] [--host HOST] [--device DEVICE]
+                                        [--workers WORKERS]
+
+✨ Run diffuzers api
+
+optional arguments:
+  -h, --help         show this help message and exit
+  --output OUTPUT    Output path is optional, but if provided, all generations will automatically be saved to this
+                     path.
+  --port PORT        Port to run the app on
+  --host HOST        Host to run the app on
+  --device DEVICE    Device to use, e.g. cpu, cuda, cuda:0, mps (for m1 mac) etc.
+  --workers WORKERS  Number of workers to use
 ```

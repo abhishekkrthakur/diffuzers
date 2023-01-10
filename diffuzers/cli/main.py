@@ -1,6 +1,7 @@
 import argparse
 
 from .. import __version__
+from .run_api import RunDiffuzersAPICommand
 from .run_app import RunDiffuzersAppCommand
 
 
@@ -15,6 +16,7 @@ def main():
 
     # Register commands
     RunDiffuzersAppCommand.register_subcommand(commands_parser)
+    RunDiffuzersAPICommand.register_subcommand(commands_parser)
 
     args = parser.parse_args()
 

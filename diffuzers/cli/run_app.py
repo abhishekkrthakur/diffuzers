@@ -22,7 +22,7 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
     @staticmethod
     def register_subcommand(parser: ArgumentParser):
         run_app_parser = parser.add_parser(
-            "run",
+            "app",
             description="✨ Run diffuzers app",
         )
         run_app_parser.add_argument(
