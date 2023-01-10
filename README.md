@@ -65,8 +65,30 @@ To run the api, run the following command:
 
 
 ```bash
-diffuzers app
+diffuzers api
 ```
+
+Starting the API requires the following environment variables:
+
+```
+export X2IMG_MODEL=stabilityai/stable-diffusion-2-1
+export DEVICE=cuda
+```
+
+If you want to use inpainting:
+
+```
+export INPAINTING_MODEL=stabilityai/stable-diffusion-2-inpainting
+```
+
+To use long prompt weighting, use:
+
+```
+export PIPELINE=lpw_stable_diffusion
+```
+
+If you have `OUTPUT_PATH` in environment variables, all generations will be saved in `OUTPUT_PATH`. You can also use other (or private) huggingface models. To use private models, you must login using `huggingface-cli login`.
+
 
 ## All CLI Options for running the app:
 

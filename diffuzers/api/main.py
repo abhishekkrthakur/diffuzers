@@ -41,12 +41,6 @@ async def startup_event():
     logger.info(f"Token Identifier: {ti_identifier}")
     logger.info(f"Token Embeddings URL: {ti_embeddings_url}")
 
-    """
-    export X2IMG_MODEL=stabilityai/stable-diffusion-2-1
-    export INPAINTING_MODEL=stabilityai/stable-diffusion-2-inpainting
-    export DEVICE=cuda
-    """
-
     logger.info("Loading x2img model...")
     if x2img_model is not None:
         app.state.x2img_model = X2Image(
