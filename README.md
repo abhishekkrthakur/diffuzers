@@ -89,6 +89,8 @@ export PIPELINE=lpw_stable_diffusion
 
 If you have `OUTPUT_PATH` in environment variables, all generations will be saved in `OUTPUT_PATH`. You can also use other (or private) huggingface models. To use private models, you must login using `huggingface-cli login`.
 
+API docs are available at `host:port/docs`. For example, with default settings, you can access docs at: `127.0.0.1:10000/docs`.
+
 
 ## All CLI Options for running the app:
 
