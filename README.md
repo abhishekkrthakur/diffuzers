@@ -55,11 +55,14 @@ pip install diffuzers
 
 ## Usage
 
+### Web App
 To run the web app, run the following command:
 
 ```bash
 diffuzers app
 ```
+
+### API
 
 To run the api, run the following command:
 
