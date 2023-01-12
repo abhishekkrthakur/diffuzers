@@ -8,6 +8,10 @@ A web ui and deployable API for [🤗 diffusers](https://github.com/huggingface/
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
+<a href='https://diffuzers.readthedocs.io/en/latest/?badge=latest'>
+    <img src='https://readthedocs.org/projects/diffuzers/badge/?version=latest' alt='Documentation Status' />
+</a>
+
 ![image](https://github.com/abhishekkrthakur/diffuzers/raw/main/static/screenshot.jpeg)
 
 
