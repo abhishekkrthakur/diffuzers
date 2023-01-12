@@ -1,13 +1,18 @@
 import base64
 import gc
+import io
 import os
 import tempfile
 import zipfile
 from datetime import datetime
+from threading import Thread
 
 import requests
 import streamlit as st
 import torch
+from huggingface_hub import HfApi
+from huggingface_hub.utils._errors import RepositoryNotFoundError
+from huggingface_hub.utils._validators import HFValidationError
 from loguru import logger
 from PIL.PngImagePlugin import PngInfo
 from st_clickable_images import clickable_images
@@ -73,17 +78,34 @@ def clear_memory(preserve):
             del st.session_state[key]
 
 
-def save_images(images, module, metadata, output_path):
-    if output_path is None:
-        logger.warning("No output path specified, skipping saving images")
-        return
-    current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+def save_to_hub(api, images, module, current_datetime, metadata, output_path):
+    _metadata = PngInfo()
+    _metadata.add_text("text2img", metadata)
+    for i, img in enumerate(images):
+        img_byte_arr = io.BytesIO()
+        img.save(img_byte_arr, format="PNG", pnginfo=_metadata)
+        img_byte_arr = img_byte_arr.getvalue()
+        api.upload_file(
+            path_or_fileobj=img_byte_arr,
+            path_in_repo=f"{module}/{current_datetime}/{i}.png",
+            repo_id=output_path,
+            repo_type="dataset",
+        )
+
+    api.upload_file(
+        path_or_fileobj=str.encode(metadata),
+        path_in_repo=f"{module}/{current_datetime}/metadata.json",
+        repo_id=output_path,
+        repo_type="dataset",
+    )
+
+
+def save_to_local(images, module, current_datetime, metadata, output_path):
+    _metadata = PngInfo()
+    _metadata.add_text("text2img", metadata)
     os.makedirs(output_path, exist_ok=True)
     os.makedirs(f"{output_path}/{module}", exist_ok=True)
     os.makedirs(f"{output_path}/{module}/{current_datetime}", exist_ok=True)
-
-    _metadata = PngInfo()
-    _metadata.add_text("text2img", metadata)
 
     for i, img in enumerate(images):
         img.save(
@@ -95,6 +117,25 @@ def save_images(images, module, metadata, output_path):
     with open(f"{output_path}/{module}/{current_datetime}/metadata.txt", "w") as f:
         f.write(metadata)
     logger.info(f"Saved images to {output_path}/{module}/{current_datetime}")
+
+
+def save_images(images, module, metadata, output_path):
+    if output_path is None:
+        logger.warning("No output path specified, skipping saving images")
+        return
+
+    api = HfApi()
+    try:
+        dset_info = api.dataset_info(output_path)
+    except (HFValidationError, RepositoryNotFoundError):
+        logger.warning("No valid hugging face repo. Saving locally...")
+
+    current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    if not dset_info:
+        save_to_local(images, module, current_datetime, metadata, output_path)
+    else:
+        Thread(target=save_to_hub, args=(api, images, module, current_datetime, metadata, output_path)).start()
 
 
 def display_and_download_images(output_images, metadata, download_col=None):

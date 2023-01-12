@@ -134,3 +134,9 @@ optional arguments:
   --device DEVICE    Device to use, e.g. cpu, cuda, cuda:0, mps (for m1 mac) etc.
   --workers WORKERS  Number of workers to use
 ```
+
+## Using private models from huggingface hub
+
+If you want to use private models from huggingface hub, then you need to login using `huggingface-cli login` command.
+
+Note: You can also save your generations directly to huggingface hub if your output path points to a huggingface hub dataset repo and you have access to push to that repository. Thus, you will end up saving a lot of disk space. 
