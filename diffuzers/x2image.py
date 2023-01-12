@@ -240,9 +240,7 @@ class X2Image:
             )
         # col3, col4 = st.columns(2)
         # with col3:
-        input_image = st.file_uploader(
-            "Upload an image to use image2image instead (optional)", type=["png", "jpg", "jpeg"]
-        )
+        input_image = st.file_uploader("Upload an image to use image2image", type=["png", "jpg", "jpeg"])
         if input_image is not None:
             input_image = Image.open(input_image)
             pipeline_name = "img2img"
@@ -275,10 +273,13 @@ class X2Image:
             negative_prompt = st.text_area("Negative Prompt", "")
         # sidebar options
         scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
-        image_height = st.sidebar.slider("Image height (ignored for img2img)", 128, 1024, 512, 128)
-        image_width = st.sidebar.slider("Image width (ignored for img2img)", 128, 1024, 512, 128)
+        if input_image is None:
+            image_height = st.sidebar.slider("Image height", 128, 1024, 512, 128)
+            image_width = st.sidebar.slider("Image width", 128, 1024, 512, 128)
         guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
-        strength = st.sidebar.slider("Strength (ignored for text2img)", 0.0, 1.0, 0.8, 0.05)
+        if input_image is not None:
+            strength = st.sidebar.slider("Denoising strength", 0.0, 1.0, 0.8, 0.05)
+
         num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
         steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
 
