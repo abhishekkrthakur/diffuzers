@@ -79,6 +79,7 @@ def clear_memory(preserve):
 
 
 def save_to_hub(api, images, module, current_datetime, metadata, output_path):
+    logger.info(f"Saving images to hub: {output_path}")
     _metadata = PngInfo()
     _metadata.add_text("text2img", metadata)
     for i, img in enumerate(images):
@@ -98,6 +99,7 @@ def save_to_hub(api, images, module, current_datetime, metadata, output_path):
         repo_id=output_path,
         repo_type="dataset",
     )
+    logger.info(f"Saved images to hub: {output_path}")
 
 
 def save_to_local(images, module, current_datetime, metadata, output_path):
@@ -125,6 +127,7 @@ def save_images(images, module, metadata, output_path):
         return
 
     api = HfApi()
+    dset_info = None
     try:
         dset_info = api.dataset_info(output_path)
     except (HFValidationError, RepositoryNotFoundError):
