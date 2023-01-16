@@ -117,9 +117,14 @@ class Inpainting:
         col1, col2 = st.columns(2)
         # with col1:
         with col1:
-            prompt = st.text_area("Prompt", "", key="inpainting_prompt")
+            prompt = st.text_area("Prompt", "", key="inpainting_prompt", help="Prompt for the image generation")
             # with col2:
-            negative_prompt = st.text_area("Negative Prompt", "", key="inpainting_negative_prompt")
+            negative_prompt = st.text_area(
+                "Negative Prompt",
+                "",
+                key="inpainting_negative_prompt",
+                help="The prompt not to guide image generation. Write things that you dont want to see in the image.",
+            )
         with col2:
             uploaded_file = st.file_uploader(
                 "Image:",
@@ -134,13 +139,47 @@ class Inpainting:
             available_schedulers.insert(
                 0, available_schedulers.pop(available_schedulers.index("EulerAncestralDiscreteScheduler"))
             )
-        scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0, key="inpainting_scheduler")
-        guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5, key="inpainting_guidance_scale")
-        num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1, key="inpainting_num_images")
-        steps = st.sidebar.slider("Steps", 1, 150, 50, 1, key="inpainting_steps")
-        seed_placeholder = st.sidebar.empty()
-        seed = seed_placeholder.number_input(
-            "Seed", value=42, min_value=1, max_value=999999, step=1, key="inpainting_seed"
+        scheduler = st.sidebar.selectbox(
+            "Scheduler",
+            available_schedulers,
+            index=0,
+            key="inpainting_scheduler",
+            help="Scheduler to use for generation",
+        )
+        guidance_scale = st.sidebar.slider(
+            "Guidance scale",
+            1.0,
+            40.0,
+            7.5,
+            0.5,
+            key="inpainting_guidance_scale",
+            help="Higher guidance scale encourages to generate images that are closely linked to the text `prompt`, usually at the expense of lower image quality.",
+        )
+        num_images = st.sidebar.slider(
+            "Number of images per prompt",
+            1,
+            30,
+            1,
+            1,
+            key="inpainting_num_images",
+            help="Number of images you want to generate. More images requires more time and uses more GPU memory.",
+        )
+        steps = st.sidebar.slider(
+            "Steps",
+            1,
+            150,
+            50,
+            1,
+            key="inpainting_steps",
+            help="The number of denoising steps. More denoising steps usually lead to a higher quality image at the expense of slower inference.",
+        )
+        seed = st.sidebar.number_input(
+            "Seed",
+            value=42,
+            min_value=1,
+            max_value=999999,
+            step=1,
+            help="Random seed. Change for different results using same parameters.",
         )
         if uploaded_file is not None:
             with col2:

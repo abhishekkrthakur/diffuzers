@@ -240,7 +240,11 @@ class X2Image:
             )
         # col3, col4 = st.columns(2)
         # with col3:
-        input_image = st.file_uploader("Upload an image to use image2image", type=["png", "jpg", "jpeg"])
+        input_image = st.file_uploader(
+            "Upload an image to use image2image",
+            type=["png", "jpg", "jpeg"],
+            help="Upload an image to use image2image. If left blank, text2image will be used instead.",
+        )
         if input_image is not None:
             input_image = Image.open(input_image)
             pipeline_name = "img2img"
@@ -268,22 +272,69 @@ class X2Image:
         # with col4:
         col1, col2 = st.columns(2)
         with col1:
-            prompt = st.text_area("Prompt", "Blue elephant")
+            prompt = st.text_area("Prompt", "Blue elephant", help="Prompt to guide image generation")
         with col2:
-            negative_prompt = st.text_area("Negative Prompt", "")
+            negative_prompt = st.text_area(
+                "Negative Prompt",
+                "",
+                help="The prompt not to guide image generation. Write things that you dont want to see in the image.",
+            )
         # sidebar options
-        scheduler = st.sidebar.selectbox("Scheduler", available_schedulers, index=0)
         if input_image is None:
-            image_height = st.sidebar.slider("Image height", 128, 1024, 512, 128)
-            image_width = st.sidebar.slider("Image width", 128, 1024, 512, 128)
-        guidance_scale = st.sidebar.slider("Guidance scale", 1.0, 40.0, 7.5, 0.5)
+            image_height = st.sidebar.slider(
+                "Image height", 128, 1024, 512, 128, help="The height in pixels of the generated image."
+            )
+            image_width = st.sidebar.slider(
+                "Image width", 128, 1024, 512, 128, help="The width in pixels of the generated image."
+            )
+
+        num_images = st.sidebar.slider(
+            "Number of images per prompt",
+            1,
+            30,
+            1,
+            1,
+            help="Number of images you want to generate. More images requires more time and uses more GPU memory.",
+        )
+
+        # add section advanced options
+        st.sidebar.markdown("### Advanced options")
+        scheduler = st.sidebar.selectbox(
+            "Scheduler", available_schedulers, index=0, help="Scheduler to use for generation"
+        )
+        guidance_scale = st.sidebar.slider(
+            "Guidance scale",
+            1.0,
+            40.0,
+            7.5,
+            0.5,
+            help="Higher guidance scale encourages to generate images that are closely linked to the text `prompt`, usually at the expense of lower image quality.",
+        )
         if input_image is not None:
-            strength = st.sidebar.slider("Denoising strength", 0.0, 1.0, 0.8, 0.05)
-
-        num_images = st.sidebar.slider("Number of images per prompt", 1, 30, 1, 1)
-        steps = st.sidebar.slider("Steps", 1, 150, 50, 1)
-
-        seed = st.sidebar.number_input("Seed", value=42, min_value=1, max_value=999999, step=1)
+            strength = st.sidebar.slider(
+                "Denoising strength",
+                0.0,
+                1.0,
+                0.8,
+                0.05,
+                help="Conceptually, indicates how much to transform the reference `image`. Must be between 0 and 1. `image` will be used as a starting point, adding more noise to it the larger the `strength`. The number of denoising steps depends on the amount of noise initially added. When `strength` is 1, added noise will be maximum and the denoising process will run for the full number of iterations specified in `num_inference_steps`. A value of 1, therefore, essentially ignores `image`.",
+            )
+        steps = st.sidebar.slider(
+            "Steps",
+            1,
+            150,
+            50,
+            1,
+            help="The number of denoising steps. More denoising steps usually lead to a higher quality image at the expense of slower inference.",
+        )
+        seed = st.sidebar.number_input(
+            "Seed",
+            value=42,
+            min_value=1,
+            max_value=999999,
+            step=1,
+            help="Random seed. Change for different results using same parameters.",
+        )
         sub_col, download_col = st.columns(2)
         with sub_col:
             submit = st.button("Generate")
