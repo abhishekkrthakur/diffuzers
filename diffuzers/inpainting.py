@@ -1,5 +1,6 @@
 import gc
 import json
+import random
 from dataclasses import dataclass
 from io import BytesIO
 from typing import Optional
@@ -67,6 +68,11 @@ class Inpainting:
     def generate_image(
         self, prompt, negative_prompt, image, mask, guidance_scale, scheduler, steps, seed, height, width, num_images
     ):
+
+        if seed == -1:
+            # generate random seed
+            seed = random.randint(0, 999999)
+
         self._set_scheduler(scheduler)
         logger.info(self.pipeline.scheduler)
 
@@ -176,11 +182,12 @@ class Inpainting:
         seed = st.sidebar.number_input(
             "Seed",
             value=42,
-            min_value=1,
+            min_value=-1,
             max_value=999999,
             step=1,
             help="Random seed. Change for different results using same parameters.",
         )
+
         if uploaded_file is not None:
             with col2:
                 drawing_mode = st.selectbox(

@@ -68,6 +68,7 @@ async def text2img(params: Text2ImgParams) -> ImgResponse:
     logger.info(f"Params: {params}")
     if app.state.x2img_model is None:
         return {"error": "x2img model is not loaded"}
+
     images, _ = app.state.x2img_model.text2img_generate(
         params.prompt,
         num_images=params.num_images,

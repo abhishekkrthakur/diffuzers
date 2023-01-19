@@ -2,6 +2,7 @@ import base64
 import gc
 import json
 import os
+import random
 import tempfile
 from dataclasses import dataclass
 from io import BytesIO
@@ -163,6 +164,11 @@ class X2Image:
     def text2img_generate(
         self, prompt, negative_prompt, scheduler, image_size, num_images, guidance_scale, steps, seed
     ):
+
+        if seed == -1:
+            # generate random seed
+            seed = random.randint(0, 999999)
+
         generator, num_images = self._pregen(
             pipeline_name="text2img",
             scheduler=scheduler,
@@ -200,6 +206,11 @@ class X2Image:
     def img2img_generate(
         self, prompt, image, strength, negative_prompt, scheduler, num_images, guidance_scale, steps, seed
     ):
+
+        if seed == -1:
+            # generate random seed
+            seed = random.randint(0, 999999)
+
         generator, num_images = self._pregen(
             pipeline_name="img2img",
             scheduler=scheduler,
@@ -330,11 +341,12 @@ class X2Image:
         seed = st.sidebar.number_input(
             "Seed",
             value=42,
-            min_value=1,
+            min_value=-1,
             max_value=999999,
             step=1,
             help="Random seed. Change for different results using same parameters.",
         )
+
         sub_col, download_col = st.columns(2)
         with sub_col:
             submit = st.button("Generate")
