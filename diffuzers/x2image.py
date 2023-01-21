@@ -384,7 +384,7 @@ class X2Image:
                 0.5,
                 help="Image guidance scale is to push the generated image towards the inital image `image`. Image guidance scale is enabled by setting `image_guidance_scale > 1`. Higher image guidance scale encourages to generate images that are closely linked to the source image `image`, usually at the expense of lower image quality.",
             )
-        if input_image is not None:
+        if input_image is not None and not use_pix2pix:
             strength = st.sidebar.slider(
                 "Denoising strength",
                 0.0,
