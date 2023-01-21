@@ -22,6 +22,7 @@ If something doesnt work as expected, or if you need some features which are not
 
 - text to image
 - image to image
+- instruct pix2pix
 - textual inversion
 - inpainting
 - outpainting (coming soon)
@@ -35,6 +36,7 @@ If something doesnt work as expected, or if you need some features which are not
 
 - text to image
 - image to image
+- instruct pix2pix
 - textual inversion
 - inpainting
 - outpainting (via inpainting)
