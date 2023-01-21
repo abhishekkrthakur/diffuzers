@@ -6,7 +6,7 @@ from loguru import logger
 from PIL import Image
 from starlette.middleware.cors import CORSMiddleware
 
-from diffuzers.api.schemas import Img2ImgParams, ImgResponse, InpaintingParams, Text2ImgParams
+from diffuzers.api.schemas import Img2ImgParams, ImgResponse, InpaintingParams, InstructPix2PixParams, Text2ImgParams
 from diffuzers.api.utils import convert_to_b64_list
 from diffuzers.inpainting import Inpainting
 from diffuzers.x2image import X2Image
@@ -98,6 +98,26 @@ async def img2img(params: Img2ImgParams = Depends(), image: UploadFile = File(..
         scheduler=params.scheduler,
         guidance_scale=params.guidance_scale,
         strength=params.strength,
+    )
+    base64images = convert_to_b64_list(images)
+    return ImgResponse(images=base64images, metadata=params.dict())
+
+
+@app.post("/instruct-pix2pix")
+async def instruct_pix2pix(params: InstructPix2PixParams = Depends(), image: UploadFile = File(...)) -> ImgResponse:
+    if app.state.x2img_model is None:
+        return {"error": "x2img model is not loaded"}
+    image = Image.open(io.BytesIO(image.file.read()))
+    images, _ = app.state.x2img_model.pix2pix_generate(
+        image=image,
+        prompt=params.prompt,
+        negative_prompt=params.negative_prompt,
+        num_images=params.num_images,
+        steps=params.steps,
+        seed=params.seed,
+        scheduler=params.scheduler,
+        guidance_scale=params.guidance_scale,
+        image_guidance_scale=params.image_guidance_scale,
     )
     base64images = convert_to_b64_list(images)
     return ImgResponse(images=base64images, metadata=params.dict())

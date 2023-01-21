@@ -16,6 +16,7 @@ from diffusers import (
     AltDiffusionPipeline,
     DiffusionPipeline,
     StableDiffusionImg2ImgPipeline,
+    StableDiffusionInstructPix2PixPipeline,
     StableDiffusionPipeline,
 )
 from loguru import logger
@@ -75,9 +76,10 @@ class X2Image:
             use_auth_token=utils.use_auth_token(),
         )
         components = self.text2img_pipeline.components
-
+        self.pix2pix_pipeline = None
         if isinstance(self.text2img_pipeline, StableDiffusionPipeline):
             self.img2img_pipeline = StableDiffusionImg2ImgPipeline(**components)
+            self.pix2pix_pipeline = StableDiffusionInstructPix2PixPipeline(**components)
         elif isinstance(self.text2img_pipeline, AltDiffusionPipeline):
             self.img2img_pipeline = AltDiffusionImg2ImgPipeline(**components)
         else:
@@ -88,6 +90,8 @@ class X2Image:
         self.text2img_pipeline.safety_checker = utils.no_safety_checker
         self.img2img_pipeline.to(self.device)
         self.img2img_pipeline.safety_checker = utils.no_safety_checker
+        self.pix2pix_pipeline.to(self.device)
+        self.pix2pix_pipeline.safety_checker = utils.no_safety_checker
 
         self.compatible_schedulers = {
             scheduler.__name__: scheduler for scheduler in self.text2img_pipeline.scheduler.compatibles
@@ -122,11 +126,17 @@ class X2Image:
                 num_inference_steps=2,
             )
 
+            self.pix2pix_pipeline.enable_attention_slicing()
+            prompt = "turn him into a cyborg"
+            _ = self.pix2pix_pipeline(prompt, image=init_image, num_inference_steps=2)
+
     def _set_scheduler(self, pipeline_name, scheduler_name):
         if pipeline_name == "text2img":
             scheduler_config = self.text2img_pipeline.scheduler.config
         elif pipeline_name == "img2img":
             scheduler_config = self.img2img_pipeline.scheduler.config
+        elif pipeline_name == "pix2pix":
+            scheduler_config = self.pix2pix_pipeline.scheduler.config
         else:
             raise ValueError(f"Pipeline {pipeline_name} not supported")
 
@@ -243,6 +253,46 @@ class X2Image:
         )
         return output_images, _metadata
 
+    def pix2pix_generate(
+        self, prompt, image, negative_prompt, scheduler, num_images, guidance_scale, image_guidance_scale, steps, seed
+    ):
+        if seed == -1:
+            # generate random seed
+            seed = random.randint(0, 999999)
+
+        generator, num_images = self._pregen(
+            pipeline_name="pix2pix",
+            scheduler=scheduler,
+            num_images=num_images,
+            seed=seed,
+        )
+        output_images = self.pix2pix_pipeline(
+            prompt=prompt,
+            image=image,
+            negative_prompt=negative_prompt,
+            num_inference_steps=steps,
+            guidance_scale=guidance_scale,
+            image_guidance_scale=image_guidance_scale,
+            num_images_per_prompt=num_images,
+            generator=generator,
+        ).images
+        metadata = {
+            "prompt": prompt,
+            "negative_prompt": negative_prompt,
+            "scheduler": scheduler,
+            "num_images": num_images,
+            "guidance_scale": guidance_scale,
+            "image_guidance_scale": image_guidance_scale,
+            "steps": steps,
+            "seed": seed,
+        }
+        output_images, _metadata = self._postgen(
+            metadata=metadata,
+            output_images=output_images,
+            pipeline_name="pix2pix",
+        )
+        return output_images, _metadata
+
     def app(self):
         available_schedulers = list(self.compatible_schedulers.keys())
         if "EulerAncestralDiscreteScheduler" in available_schedulers:
@@ -252,13 +302,17 @@ class X2Image:
         # col3, col4 = st.columns(2)
         # with col3:
         input_image = st.file_uploader(
-            "Upload an image to use image2image",
+            "Upload an image to use image2image or pix2pix",
             type=["png", "jpg", "jpeg"],
             help="Upload an image to use image2image. If left blank, text2image will be used instead.",
         )
+        use_pix2pix = st.checkbox("Use pix2pix", value=False)
         if input_image is not None:
             input_image = Image.open(input_image)
-            pipeline_name = "img2img"
+            if use_pix2pix:
+                pipeline_name = "pix2pix"
+            else:
+                pipeline_name = "img2img"
             # display image using html
             # convert image to base64
             # st.markdown(f"<img src='data:image/png;base64,{input_image}' width='200'>", unsafe_allow_html=True)
@@ -321,6 +375,15 @@ class X2Image:
             0.5,
             help="Higher guidance scale encourages to generate images that are closely linked to the text `prompt`, usually at the expense of lower image quality.",
         )
+        if use_pix2pix and input_image is not None:
+            image_guidance_scale = st.sidebar.slider(
+                "Image guidance scale",
+                1.0,
+                40.0,
+                1.5,
+                0.5,
+                help="Image guidance scale is to push the generated image towards the inital image `image`. Image guidance scale is enabled by setting `image_guidance_scale > 1`. Higher image guidance scale encourages to generate images that are closely linked to the source image `image`, usually at the expense of lower image quality.",
+            )
         if input_image is not None:
             strength = st.sidebar.slider(
                 "Denoising strength",
@@ -373,6 +436,18 @@ class X2Image:
                         scheduler=scheduler,
                         num_images=num_images,
                         guidance_scale=guidance_scale,
+                        steps=steps,
+                        seed=seed,
+                    )
+                elif pipeline_name == "pix2pix":
+                    output_images, metadata = self.pix2pix_generate(
+                        prompt=prompt,
+                        image=input_image,
+                        negative_prompt=negative_prompt,
+                        scheduler=scheduler,
+                        num_images=num_images,
+                        guidance_scale=guidance_scale,
+                        image_guidance_scale=image_guidance_scale,
                         steps=steps,
                         seed=seed,
                     )
