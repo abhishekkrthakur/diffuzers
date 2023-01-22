@@ -96,8 +96,9 @@ class X2Image:
         self.text2img_pipeline.safety_checker = utils.no_safety_checker
         self.img2img_pipeline.to(self.device)
         self.img2img_pipeline.safety_checker = utils.no_safety_checker
-        self.pix2pix_pipeline.to(self.device)
-        self.pix2pix_pipeline.safety_checker = utils.no_safety_checker
+        if self.pix2pix_pipeline is not None:
+            self.pix2pix_pipeline.to(self.device)
+            self.pix2pix_pipeline.safety_checker = utils.no_safety_checker
 
         self.compatible_schedulers = {
             scheduler.__name__: scheduler for scheduler in self.text2img_pipeline.scheduler.compatibles
@@ -131,10 +132,10 @@ class X2Image:
                 guidance_scale=7.5,
                 num_inference_steps=2,
             )
-
-            self.pix2pix_pipeline.enable_attention_slicing()
-            prompt = "turn him into a cyborg"
-            _ = self.pix2pix_pipeline(prompt, image=init_image, num_inference_steps=2)
+            if self.pix2pix_pipeline is not None:
+                self.pix2pix_pipeline.enable_attention_slicing()
+                prompt = "turn him into a cyborg"
+                _ = self.pix2pix_pipeline(prompt, image=init_image, num_inference_steps=2)
 
     def _set_scheduler(self, pipeline_name, scheduler_name):
         if pipeline_name == "text2img":
