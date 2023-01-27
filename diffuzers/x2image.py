@@ -16,6 +16,7 @@ from diffusers import (
     AltDiffusionPipeline,
     DiffusionPipeline,
     StableDiffusionImg2ImgPipeline,
+    StableDiffusionInstructPix2PixPipeline,
     StableDiffusionPipeline,
 )
 from loguru import logger
@@ -78,14 +79,7 @@ class X2Image:
         self.pix2pix_pipeline = None
         if isinstance(self.text2img_pipeline, StableDiffusionPipeline):
             self.img2img_pipeline = StableDiffusionImg2ImgPipeline(**components)
-            try:
-                from diffusers import StableDiffusionInstructPix2PixPipeline
-
-                self.pix2pix_pipeline = StableDiffusionInstructPix2PixPipeline(**components)
-            except ImportError:
-                logger.error(
-                    "Pix2Pix pipeline not available. Please install the main branch of diffusers using `pip install -U git+https://github.com/huggingface/diffusers.git`"
-                )
+            self.pix2pix_pipeline = StableDiffusionInstructPix2PixPipeline(**components)
         elif isinstance(self.text2img_pipeline, AltDiffusionPipeline):
             self.img2img_pipeline = AltDiffusionImg2ImgPipeline(**components)
         else:
