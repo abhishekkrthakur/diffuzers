@@ -15,6 +15,8 @@ def run_app_command_factory(args):
         args.host,
         args.device,
         args.ngrok_key,
+        args.ssl_certfile,
+        args.ssl_keyfile,
     )
 
 
@@ -62,15 +64,29 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
             required=False,
             help="Ngrok key to use for sharing the app. Only required if you want to share the app",
         )
+        run_api_parser.add_argument(
+            "--ssl_certfile",
+            type=str,
+            required=False,
+            help="the path to your ssl cert"
+        )
+        run_api_parser.add_argument(
+            "--ssl_keyfile",
+            type=str,
+            required=False,
+            help="the path to your ssl key"
+        )
         run_app_parser.set_defaults(func=run_app_command_factory)
 
-    def __init__(self, output, share, port, host, device, ngrok_key):
+    def __init__(self, output, share, port, host, device, ngrok_key, ssl_certfile, ssl_keyfile):
         self.output = output
         self.share = share
         self.port = port
         self.host = host
         self.device = device
         self.ngrok_key = ngrok_key
+        self.ssl_certfile = ssl_certfile
+        self.ssl_keyfile = ssl_keyfile
 
         if self.device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -106,6 +122,10 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
             "--",
             "--device",
             self.device,
+            "--ssl-certfile",
+            self.ssl_certfile,
+            "--ssl-keyfile",
+            self.ssl_keyfile,
         ]
         if self.output is not None:
             cmd.extend(["--output", self.output])
