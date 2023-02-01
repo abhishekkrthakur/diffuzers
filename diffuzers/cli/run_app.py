@@ -65,7 +65,7 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
         
         run_app_parser.set_defaults(func=run_app_command_factory)
 
-    def __init__(self, output, share, port, host, device, ngrok_key, ssl_certfile, ssl_keyfile):
+    def __init__(self, output, share, port, host, device, ngrok_key):
         self.output = output
         self.share = share
         self.port = port
