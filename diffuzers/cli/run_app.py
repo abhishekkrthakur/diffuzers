@@ -122,10 +122,6 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
             "--",
             "--device",
             self.device,
-            "--ssl-certfile",
-            self.ssl_certfile,
-            "--ssl-keyfile",
-            self.ssl_keyfile,
         ]
         if self.output is not None:
             cmd.extend(["--output", self.output])
