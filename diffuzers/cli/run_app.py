@@ -72,8 +72,7 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
         self.host = host
         self.device = device
         self.ngrok_key = ngrok_key
-        self.ssl_keyfile = ssl_keyfile
-
+        
         if self.device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
