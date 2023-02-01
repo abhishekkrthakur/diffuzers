@@ -15,8 +15,6 @@ def run_app_command_factory(args):
         args.host,
         args.device,
         args.ngrok_key,
-        args.ssl_certfile,
-        args.ssl_keyfile,
     )
 
 
@@ -64,18 +62,7 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
             required=False,
             help="Ngrok key to use for sharing the app. Only required if you want to share the app",
         )
-        run_api_parser.add_argument(
-            "--ssl_certfile",
-            type=str,
-            required=False,
-            help="the path to your ssl cert"
-        )
-        run_api_parser.add_argument(
-            "--ssl_keyfile",
-            type=str,
-            required=False,
-            help="the path to your ssl key"
-        )
+        
         run_app_parser.set_defaults(func=run_app_command_factory)
 
     def __init__(self, output, share, port, host, device, ngrok_key, ssl_certfile, ssl_keyfile):
