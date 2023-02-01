@@ -72,7 +72,6 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
         self.host = host
         self.device = device
         self.ngrok_key = ngrok_key
-        self.ssl_certfile = ssl_certfile
         self.ssl_keyfile = ssl_keyfile
 
         if self.device is None:
