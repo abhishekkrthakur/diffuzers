@@ -97,6 +97,11 @@ class RunDiffuzersAPICommand(BaseDiffuzersCommand):
             self.port,
             "--workers",
             self.workers,
+            "--ssl-certfile",
+            self.ssl_certfile,
+            "--ssl-keyfile",
+            self.ssl_keyfile,
+            
         ]
 
         proc = subprocess.Popen(
