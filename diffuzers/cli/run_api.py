@@ -13,8 +13,6 @@ def run_api_command_factory(args):
         args.host,
         args.device,
         args.workers,
-        args.ssl_certfile,
-        args.ssl_keyfile,
     )
 
 
@@ -58,28 +56,14 @@ class RunDiffuzersAPICommand(BaseDiffuzersCommand):
             default=1,
             help="Number of workers to use",
         )
-        run_api_parser.add_argument(
-            "--ssl_certfile",
-            type=str,
-            required=False,
-            help="the path to your ssl cert"
-        )
-        run_api_parser.add_argument(
-            "--ssl_keyfile",
-            type=str,
-            required=False,
-            help="the path to your ssl key"
-        )
         run_api_parser.set_defaults(func=run_api_command_factory)
 
-    def __init__(self, output, port, host, device, workers, ssl_certfile, ssl_keyfile):
+    def __init__(self, output, port, host, device, workers):
         self.output = output
         self.port = port
         self.host = host
         self.device = device
         self.workers = workers
-        self.ssl_certfile = ssl_certfile
-        self.ssl_keyfile = ssl_keyfile
 
         if self.device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -97,11 +81,6 @@ class RunDiffuzersAPICommand(BaseDiffuzersCommand):
             self.port,
             "--workers",
             self.workers,
-            "--ssl-certfile",
-            self.ssl_certfile,
-            "--ssl-keyfile",
-            self.ssl_keyfile,
-            
         ]
 
         proc = subprocess.Popen(
