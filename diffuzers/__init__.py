@@ -5,4 +5,6 @@ from loguru import logger
 
 logger.configure(handlers=[dict(sink=sys.stderr, format="> <level>{level:<7} {message}</level>")])
 
-__version__ = "0.3.4"
+__version__ = "0.3.5
+
+"
