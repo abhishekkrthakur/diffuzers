@@ -62,7 +62,7 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
             required=False,
             help="Ngrok key to use for sharing the app. Only required if you want to share the app",
         )
-        
+
         run_app_parser.set_defaults(func=run_app_command_factory)
 
     def __init__(self, output, share, port, host, device, ngrok_key):
@@ -72,7 +72,7 @@ class RunDiffuzersAppCommand(BaseDiffuzersCommand):
         self.host = host
         self.device = device
         self.ngrok_key = ngrok_key
-        
+
         if self.device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
 

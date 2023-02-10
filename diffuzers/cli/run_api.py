@@ -62,13 +62,13 @@ class RunDiffuzersAPICommand(BaseDiffuzersCommand):
             "--ssl_certfile",
             type=str,
             required=False,
-            help="the path to your ssl cert"
+            help="the path to your ssl cert",
         )
         run_api_parser.add_argument(
             "--ssl_keyfile",
             type=str,
             required=False,
-            help="the path to your ssl key"
+            help="the path to your ssl key",
         )
         run_api_parser.set_defaults(func=run_api_command_factory)
 
@@ -97,12 +97,11 @@ class RunDiffuzersAPICommand(BaseDiffuzersCommand):
             self.port,
             "--workers",
             self.workers,
-            "--ssl-certfile",
-            self.ssl_certfile,
-            "--ssl-keyfile",
-            self.ssl_keyfile,
-            
         ]
+        if self.ssl_certfile is not None:
+            cmd.extend(["--ssl-certfile", self.ssl_certfile])
+        if self.ssl_keyfile is not None:
+            cmd.extend(["--ssl-keyfile", self.ssl_keyfile])
 
         proc = subprocess.Popen(
             cmd,
