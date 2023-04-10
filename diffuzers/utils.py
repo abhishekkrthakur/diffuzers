@@ -45,6 +45,8 @@ def use_auth_token():
     token_path = os.path.join(os.path.expanduser("~"), ".huggingface", "token")
     if os.path.exists(token_path):
         return True
+    if "HF_TOKEN" in os.environ:
+        return os.environ["HF_TOKEN"]
     return False
 
 
